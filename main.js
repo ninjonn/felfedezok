@@ -1,3 +1,5 @@
+const tomb = [] // Létrehozunk egy tömböt, ami a táblázat adatait tárolja
+
 /**
  * Létrehoz egy új div elemet a megadott osztálynévvel
  * @param {string} osztalyNev - Az osztály neve, amelyet a létrehozott div elemhez rendelünk
@@ -8,6 +10,7 @@ const csinalDiv = (osztalyNev) => {
     div.className = osztalyNev; // Beállítja a létrehozott div 'class' attribútumát a megadott osztálynévre
     return div; // Visszaadja a létrehozott és beállított div elemet
 }
+
 const kontenerDiv = csinalDiv('container'); // Meghívjuk a csinalDiv függvényt 'container' osztálynévvel, és eltároljuk az eredményt kontenerDiv változóba
 document.body.appendChild(kontenerDiv); // Hozzáadjuk a kontenerDiv-et az oldal body eleméhez
 const tablaDiv = csinalDiv('table'); // Meghívjuk a csinalDiv függvényt 'table' osztálynévvel
@@ -63,6 +66,40 @@ for(const mezoElem of mezoLista){ // Végigiterálunk a mezoElemLista tömb elem
 const gombUrlap = document.createElement('button'); // Létrehozunk egy új 'button' elemet
 gombUrlap.textContent = 'hozzáadás'; // Beállítjuk a gomb szövegét 'hozzáadás'-ra
 urlapSim.appendChild(gombUrlap) // Hozzáadjuk a gombot az űrlaphoz
+
+/**
+ * Eseményfigyelő az űrlap 'submit' eseményére
+ * Az űrlap beküldésekor megakadályozza az alapértelmezett viselkedést,
+ * összegyűjti a mezők értékeit, hozzáadja azokat egy tömbhöz, és frissíti a táblázatot az új adatokkal
+ * @param {SubmitEvent} e - Az esemény objektum, amely a 'submit' eseményhez tartozik
+ */
+urlapSim.addEventListener('submit', (e) => { // Hozzáadunk egy eseményfigyelőt az űrlaphoz, ami a 'submit' eseményre reagál
+    e.preventDefault(); // Megakadályozzuk az űrlap alapértelmezett viselkedését
+    const ertekObject = {} // Létrehozunk egy üres objektumot, ami a mezők értékeit tárolja
+    const bemenetiMezok = e.target.querySelectorAll('input'); // Kiválasztjuk az összes bemeneti mezőt az űrlapon
+    for(const bemenetiMezo of bemenetiMezok){ // Végigiterálunk a bemeneti mezőkön
+        ertekObject[bemenetiMezo.id] = bemenetiMezo.value; // Beállítjuk az objektum kulcsait a mezők azonosítójára, és értékeit a mezők értékére
+    }
+    tomb.push(ertekObject); // Hozzáadjuk az objektumot a tomb tömbhöz
+    const tablaTestSor = document.createElement('tr'); // Létrehozunk egy új 'tr' elemet, ami a táblázat törzsében egy sort képvisel
+    tablaTest.appendChild(tablaTestSor); // Hozzáadjuk a sort a táblázat törzséhez
+    
+    const nevCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
+    nevCella.textContent = ertekObject.nev; // Beállítjuk a cella szövegét az objektum 'nev' kulcsának értékére
+    tablaTestSor.appendChild(nevCella); // Hozzáadjuk a cellát a sorhoz
+
+    const szolgalatCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
+    szolgalatCella.textContent = ertekObject.szolgalat; // Beállítjuk a cella szövegét az objektum 'szolgalat' kulcsának értékére
+    tablaTestSor.appendChild(szolgalatCella); // Hozzáadjuk a cellát a sorhoz
+
+    const evszamCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
+    evszamCella.textContent = ertekObject.evszam; // Beállítjuk a cella szövegét az objektum 'evszam' kulcsának értékére
+    tablaTestSor.appendChild(evszamCella); // Hozzáadjuk a cellát a sorhoz
+
+    const felfedezesCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
+    felfedezesCella.textContent = ertekObject.felfedezes; // Beállítjuk a cella szövegét az objektum 'felfedezes' kulcsának értékére
+    tablaTestSor.appendChild(felfedezesCella); // Hozzáadjuk a cellát a sorhoz
+})
 
 kontenerDiv.appendChild(tablaDiv); // A konténer div-hez hozzáadjuk a tablaDiv-et
 kontenerDiv.appendChild(urlapDiv); // A konténer div-hez hozzáadjuk az urlapDiv-et is
