@@ -8,18 +8,32 @@ class Terulet {
     #div; // A #div egy privát mező, amely a létrehozott div elemet tárolja
 
     /**
+     * @type {Manager}
+    */
+    #manager; // A #manager egy privát mező, amely a menedzsert tárolja
+
+    /**
      * @returns {HTMLDivElement} - A létrehozott div elem
      */
     get div() { // Getter metódus, amely visszaadja a #div mező értékét
         return this.#div; // Visszaadja a privát #div mező értékét
+    }
+
+    /**
+     * @returns {Manager} - A menedzser példány
+    */
+    get manager() { // Getter metódus, amely visszaadja a #manager mező értékét
+        return this.#manager; // Visszaadja a privát #manager mező értékét
     }
     
 
     /**
      * Létrehoz egy új `Terulet` példányt.
      * @param {string} osztalyNev - Az osztály neve, amelyet a létrehozott div elemhez rendelünk.
+     * @param {Manager} manager - A manager példány, amelyet a területhez rendelünk.
      */
-    constructor(osztalyNev) { // Az osztály konstruktora, ami egy osztálynevet vár paraméterként
+    constructor(osztalyNev,manager) { // Az osztály konstruktora, ami egy osztálynevet vár paraméterként
+        this.#manager = manager; // Inicializálja a #manager
         const kontener = this.#getKontenerDiv(); // Meghívja a privát #getKontenerDiv metódust, hogy megszerezze a konténer div-et
         this.#div = document.createElement('div'); // Létrehozunk egy új div elemet
         this.#div.className = osztalyNev; // Beállítjuk a div osztályát a konstruktorban kapott paraméter alapján
@@ -48,12 +62,54 @@ class Terulet {
 class Tablazat extends Terulet {
     /**
      * @type {HTMLTableElement}
+     * @param {Manager} manager - A menedzser példány, amelyet a táblázathoz rendelünk.
      */
-    constructor(cssOsztaly) { // A Tablazat osztály konstruktora, ami egy CSS osztálynevet vár paraméterként
-        super(cssOsztaly); // Meghívja a szülő osztály konstruktorát, hogy létrehozza a div elemet
+    constructor(cssOsztaly, manager) { // Az osztály konstruktora, ami egy osztálynevet és egy manager-t vár paraméterként
+        super(cssOsztaly, manager); // Meghívja a szülő osztály konstruktorát, hogy létrehozza a div elemet
         const tablaTest = this.#createTabla(); // Létrehoz egy új 'table' elemet
+
+        /**
+         * Callback függvény, amely egy új táblázatsort hoz létre és hozzáadja a táblázat törzséhez.
+         * 
+         * @callback AddExploreCallback
+         * @param {Object} exp - Az `Explore` példány, amely tartalmazza a felfedező adatait.
+         * @param {string} exp.nev - A felfedező neve.
+         * @param {string} exp.szolgalat - A felfedező szolgálata.
+         * @param {number} exp.evszam - A felfedezés évszáma.
+         * @param {string} exp.felfedezes - A felfedezés neve.
+         */
+
+        /**
+         * Beállítja az `AddExploreCallback` függvényt a manager számára.
+         * 
+         * @param {AddExploreCallback} callback - A callback függvény, amelyet a manager hív meg új `Explore` példány hozzáadásakor.
+         */
+        this.manager.setAddExploreCallback((exp) => {
+            const TablaTestSor = document.createElement('tr'); // Létrehoz egy új 'tr' elemet, ami a táblázat sorát képviseli
+            
+            const nevCella = document.createElement('td'); // Létrehoz egy új 'td' elemet, ami a táblázat celláját képviseli
+            nevCella.textContent = exp.nev; // Beállítja a cella szövegét a felfedező nevére
+            TablaTestSor.appendChild(nevCella); // Hozzáadja a cellát a táblázat sorához
+
+            const szolgalatCella = document.createElement('td'); // Létrehoz egy új 'td' elemet, ami a táblázat celláját képviseli
+            szolgalatCella.textContent = exp.szolgalat; // Beállítja a cella szövegét a felfedező szolgálatára
+            TablaTestSor.appendChild(szolgalatCella); // Hozzáadja a cellát a táblázat sorához
+
+            const evszamCella = document.createElement('td'); // Létrehoz egy új 'td' elemet, ami a táblázat celláját képviseli
+            evszamCella.textContent = exp.evszam; // Beállítja a cella szövegét a felfedező évszámára
+            TablaTestSor.appendChild(evszamCella); // Hozzáadja a cellát a táblázat sorához
+
+            const felfedezesCella = document.createElement('td'); // Létrehoz egy új 'td' elemet, ami a táblázat celláját képviseli
+            felfedezesCella.textContent = exp.felfedezes; // Beállítja a cella szövegét a felfedezés nevére
+            TablaTestSor.appendChild(felfedezesCella); // Hozzáadja a cellát a táblázat sorához
+            tablaTest.appendChild(TablaTestSor); // Hozzáadja a táblázat sorát a táblázat törzséhez
+        })
     }
 
+    /**
+     * Létrehoz egy új táblázatot és visszaadja a törzsét.
+     * @returns {HTMLTableSectionElement} - A létrehozott táblázat törzse
+    */
     #createTabla() { // Privát metódus, amely létrehozza a táblázatot
         const tabla = document.createElement('table'); // Létrehoz egy új 'table' elemet
         this.div.appendChild(tabla); // Hozzáadja a táblázatot a div-hez
@@ -83,9 +139,10 @@ class Urlap extends Terulet {
      * Az űrlap mezőket és egy gombot hoz létre, majd hozzáadja azokat a konténerhez.
      * @param {string} cssOsztaly - Az osztály neve, amelyet a létrehozott div elemhez rendelünk.
      * @param {Array<Object>} mezoLista - A mezők listája, amely tartalmazza az egyes mezők azonosítóját és címkéjét.
+     * @param {Manager} manager - A manager példány, amelyet a táblázathoz rendelünk.
      */
-    constructor(cssOsztaly, mezoLista) { 
-        super(cssOsztaly); // Meghívja a szülő osztály konstruktorát, hogy létrehozza a div elemet
+    constructor(cssOsztaly, mezoLista, manager) { 
+        super(cssOsztaly, manager); // Meghívja a szülő osztály konstruktorát, hogy létrehozza a div elemet
         const urlap = document.createElement('form'); // Létrehoz egy új 'form' elemet
         this.div.appendChild(urlap); // Hozzáadja az űrlapot a div-hez
         
@@ -97,12 +154,31 @@ class Urlap extends Terulet {
             cimke.textContent = mezoElem.mezocimke; // Beállítjuk a címke szövegét a mező címkéjére
             mezo.appendChild(cimke) // Hozzáadjuk a címkét a mezőhöz
             const input = document.createElement('input'); // Létrehozunk egy új 'input' elemet
-            input.id = mezoElem.mezocimke; // Beállítjuk az input azonosítóját a mező azonosítójára
+            input.id = mezoElem.mezoid; // Beállítjuk az input azonosítóját a mező azonosítójára
             mezo.appendChild(document.createElement('br')) // Hozzáadunk egy új 'br' elemet a mezőhöz, hogy új sort hozzunk létre
             mezo.appendChild(input) // Hozzáadjuk az input elemet a mezőhöz
         }
         const gomb = document.createElement('button'); // Létrehozunk egy új 'button' elemet
         gomb.textContent = 'hozzáadás'; // Beállítjuk a gomb szövegét 'hozzáadás'-ra
         urlap.appendChild(gomb); // Hozzáadjuk a gombot az űrlaphoz
+        
+        /**
+         * Eseményfigyelő az űrlap 'submit' eseményére.
+         * Az űrlap beküldésekor megakadályozza az alapértelmezett viselkedést,
+         * összegyűjti a mezők értékeit, létrehoz egy új `Explore` példányt,
+         * és hozzáadja azt a managerhez.
+         * 
+         * @param {SubmitEvent} e - Az esemény objektum, amely a 'submit' eseményhez tartozik
+        */
+        urlap.addEventListener('submit', (e)=> {
+            e.preventDefault(); // Megakadályozza az űrlap alapértelmezett elküldését
+            const bemenetiMezokLista = e.target.querySelectorAll('input'); // Megkeresi az összes bemeneti mezőt az űrlapon
+            const ertekObject = {}; // Létrehoz egy üres objektumot, amelybe a mezők értékeit fogja tárolni
+            for(const bemenetiMezo of bemenetiMezokLista){ // Végigiterál a bemeneti mezők listáján
+                ertekObject[bemenetiMezo.id] = bemenetiMezo.value; // Beállítja az objektum kulcsait a mezők azonosítójára, és értékeit a mezők értékére
+            }
+            const explore = new Explore(ertekObject.nev, ertekObject.szolgalat, Number(ertekObject.evszam), ertekObject.felfedezes); // Létrehoz egy új Explore példányt a megadott értékekkel
+            this.manager.addExplore(explore); // Hozzáadja az Explore példányt a managerhez
+        })
     }
 }

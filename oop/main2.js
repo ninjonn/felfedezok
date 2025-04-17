@@ -16,6 +16,6 @@ const mezokLista = [{ // Létrehozunk egy tömböt, ami a mezőket tárolja
     mezoid: 'felfedezes', // A mező azonosítója
     mezocimke: 'felfedezés' // A mező címkéje
 }]
-
-const tabla = new Tablazat('table'); // A Tablazat osztály példányosítása, létrehozva egy új 'table' osztályú elemet
-const urlap = new Urlap('form', mezokLista); // Az Urlap osztály példányosítása, létrehozva egy új 'form' osztályú elemet
+const manager = new Manager(); // A Manager osztály példányosítása, létrehozva egy új menedzsert
+const tabla = new Tablazat('table', manager); // A Tablazat osztály példányosítása, létrehozva egy új 'table' osztályú elemet
+const urlap = new Urlap('form', mezokLista, manager); // Az Urlap osztály példányosítása, létrehozva egy új 'form' osztályú elemet
