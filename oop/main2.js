@@ -1,4 +1,21 @@
 const elvalaszto = document.createElement('hr'); // hogy a html-en egyszeruen megtalalhato legyen az elvalaszto oop es sima kozott
 document.body.appendChild(elvalaszto); // Hozzáadunk egy elválasztó elemet a body-hoz, hogy vizuálisan elválasszuk az OOP és a sima kódot
+const mezokLista = [{ // Létrehozunk egy tömböt, ami a mezőket tárolja
+    mezoid: 'nev', // A mező azonosítója 
+    mezocimke: 'név' // A mező címkéje
+},
+{
+    mezoid: 'szolgalat', // A mező azonosítója
+    mezocimke: 'szolgálat' // A mező címkéje
+},
+{
+    mezoid: 'evszam', // A mező azonosítója
+    mezocimke: 'évszám' // A mező címkéje
+},
+{
+    mezoid: 'felfedezes', // A mező azonosítója
+    mezocimke: 'felfedezés' // A mező címkéje
+}]
+
 const tabla = new Tablazat('table'); // A Tablazat osztály példányosítása, létrehozva egy új 'table' osztályú elemet
-const urlap = new Urlap('form'); // Az Urlap osztály példányosítása, létrehozva egy új 'form' osztályú elemet
+const urlap = new Urlap('form', mezokLista); // Az Urlap osztály példányosítása, létrehozva egy új 'form' osztályú elemet

@@ -10,24 +10,34 @@ class Terulet {
     /**
      * @returns {HTMLDivElement} - A létrehozott div elem
      */
-    get div() { // Getter metódus, amely visszaadja a #div mező értékét}
+    get div() { // Getter metódus, amely visszaadja a #div mező értékét
         return this.#div; // Visszaadja a privát #div mező értékét
     }
+    
 
     /**
      * Létrehoz egy új `Terulet` példányt.
      * @param {string} osztalyNev - Az osztály neve, amelyet a létrehozott div elemhez rendelünk.
      */
     constructor(osztalyNev) { // Az osztály konstruktora, ami egy osztálynevet vár paraméterként
+        const kontener = this.#getKontenerDiv(); // Meghívja a privát #getKontenerDiv metódust, hogy megszerezze a konténer div-et
+        this.#div = document.createElement('div'); // Létrehozunk egy új div elemet
+        this.#div.className = osztalyNev; // Beállítjuk a div osztályát a konstruktorban kapott paraméter alapján
+        kontener.appendChild(this.#div); // Hozzáadjuk a létrehozott div-et a konténerhez
+        }
+    
+    /**
+     * Privát metódus, amely visszaadja a konténer div-et.
+     * @returns {HTMLDivElement} - A konténer div elem
+    */
+    #getKontenerDiv() { // Privát metódus, amely visszaadja a konténer div-et
         let kontenerDiv = document.querySelector('.containeroop'); // Megpróbálunk megkeresni egy létező elemet, amelynek osztályneve 'containeroop'
         if (!kontenerDiv) { // Ha nem találunk ilyen elemet
             kontenerDiv = document.createElement('div'); // Létrehozunk egy új div elemet
             kontenerDiv.className = 'containeroop'; // Beállítjuk az új div 'class' attribútumát 'containeroop'-ra
             document.body.appendChild(kontenerDiv); // Hozzáadjuk a div-et a dokumentum body eleméhez
         }
-        this.#div = document.createElement('div'); // Létrehozunk egy új div elemet
-        this.#div.className = osztalyNev; // Beállítjuk a div osztályát a konstruktorban kapott paraméter alapján
-        kontenerDiv.appendChild(this.#div); // Hozzáadjuk a létrehozott div-et a konténerhez
+        return kontenerDiv; // Visszaadja a konténer div-et
     }
 }
 
@@ -41,6 +51,10 @@ class Tablazat extends Terulet {
      */
     constructor(cssOsztaly) { // A Tablazat osztály konstruktora, ami egy CSS osztálynevet vár paraméterként
         super(cssOsztaly); // Meghívja a szülő osztály konstruktorát, hogy létrehozza a div elemet
+        const tablaTest = this.#createTabla(); // Létrehoz egy új 'table' elemet
+    }
+
+    #createTabla() { // Privát metódus, amely létrehozza a táblázatot
         const tabla = document.createElement('table'); // Létrehoz egy új 'table' elemet
         this.div.appendChild(tabla); // Hozzáadja a táblázatot a div-hez
         const tablaFejlec = document.createElement('thead'); // Létrehoz egy új 'thead' elemet, ami a táblázat fejlécét képviseli
@@ -55,6 +69,7 @@ class Tablazat extends Terulet {
         }
         const tablaTest = document.createElement('tbody'); // Létrehozunk egy új 'tbody' elemet, ami a táblázat törzsét képviseli
         tabla.appendChild(tablaTest); // Hozzáadjuk a 'tbody' elemet a táblázathoz
+        return tablaTest; // Visszaadja a táblázat törzsét
     }
 }
 
@@ -64,29 +79,16 @@ class Tablazat extends Terulet {
  */
 class Urlap extends Terulet {
     /**
-     * @type {HTMLFormElement}
+     * Létrehoz egy új `Urlap` példányt.
+     * Az űrlap mezőket és egy gombot hoz létre, majd hozzáadja azokat a konténerhez.
+     * @param {string} cssOsztaly - Az osztály neve, amelyet a létrehozott div elemhez rendelünk.
+     * @param {Array<Object>} mezoLista - A mezők listája, amely tartalmazza az egyes mezők azonosítóját és címkéjét.
      */
-    constructor(cssOsztaly) { 
+    constructor(cssOsztaly, mezoLista) { 
         super(cssOsztaly); // Meghívja a szülő osztály konstruktorát, hogy létrehozza a div elemet
         const urlap = document.createElement('form'); // Létrehoz egy új 'form' elemet
         this.div.appendChild(urlap); // Hozzáadja az űrlapot a div-hez
-        const mezoLista = [{ // Létrehozunk egy tömböt, ami a mezőket tárolja
-            mezoid: 'nev', // A mező azonosítója 
-            mezocimke: 'név' // A mező címkéje
-        },
-        {
-            mezoid: 'szolgalat', // A mező azonosítója
-            mezocimke: 'szolgálat' // A mező címkéje
-        },
-        {
-            mezoid: 'evszam', // A mező azonosítója
-            mezocimke: 'évszám' // A mező címkéje
-        },
-        {
-            mezoid: 'felfedezes', // A mező azonosítója
-            mezocimke: 'felfedezés' // A mező címkéje
-        }]
-
+        
         for (const mezoElem of mezoLista) { // Végigiterálunk a mezoElemLista tömb elemein
             const mezo = csinalDiv('field'); // Meghívjuk a csinalDiv függvényt 'field' osztálynévvel, és eltároljuk az eredményt mezo néven
             urlap.appendChild(mezo); // Hozzáadjuk a mezo-t az űrlaphoz
