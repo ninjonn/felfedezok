@@ -26,7 +26,43 @@ for(const cellaTartalom of theadCella){ // Végigiterálunk a theadCella tömb e
 const tablaTest = document.createElement('tbody'); // Létrehozunk egy új 'tbody' elemet
 tablaSim.appendChild(tablaTest); // Hozzáadjuk a 'tbody' elemet a táblázathoz
 
-const urlapDiv = csinalDiv('form'); // Ismét meghívjuk a makeDiv-et, ezúttal 'form' osztálynévvel, és eltároljuk az eredményt urlapDiv néven
+const urlapDiv = csinalDiv('form'); // Meghívjuk a makeDiv-et, ezúttal 'form' osztálynévvel, és eltároljuk az eredményt urlapDiv néven
+
+const urlapSim = document.createElement('form'); // Létrehozunk egy új 'form' elemet
+urlapDiv.appendChild(urlapSim) // Hozzáadjuk a urlapSim-t a urlapDiv-hez
+const mezoLista = [{ // Létrehozunk egy tömböt, ami a mezőket tárolja
+    mezoid: 'nev', // A mező azonosítója
+    mezocimke: 'név' // A mező címkéje
+},
+{
+    mezoid: 'szolgalat', // A mező azonosítója
+    mezocimke: 'szolgálat' // A mező címkéje
+},
+{
+    mezoid: 'evszam', // A mező azonosítója
+    mezocimke: 'évszám' // A mező címkéje
+},
+{
+    mezoid: 'felfedezes', // A mező azonosítója
+    mezocimke: 'felfedezés' // A mező címkéje
+}]
+
+for(const mezoElem of mezoLista){ // Végigiterálunk a mezoElemLista tömb elemein
+    const mezo = csinalDiv('field'); // Meghívjuk a csinalDiv függvényt 'field' osztálynévvel, és eltároljuk az eredményt mezo néven
+    urlapSim.appendChild(mezo); // Hozzáadjuk a mezo-t a urlapSim-hez
+    const cimke = document.createElement('label'); // Létrehozunk egy új 'label' elemet
+    cimke.htmlFor = mezoElem.mezoid; // Beállítjuk a címke htmlFor attribútumát a mező azonosítójára
+    cimke.textContent = mezoElem.mezocimke; // Beállítjuk a címke szövegét a mező címkéjére
+    mezo.appendChild(cimke) // Hozzáadjuk a címkét a mezőhöz
+    const input = document.createElement('input'); // Létrehozunk egy új 'input' elemet
+    input.id = mezoElem.mezoid; // Beállítjuk az input azonosítóját a mező azonosítójára
+    mezo.appendChild(document.createElement('br')) // Hozzáadunk egy új 'br' elemet a mezőhöz, hogy új sort hozzunk létre
+    mezo.appendChild(input) // Hozzáadjuk az input elemet a mezőhöz
+}
+
+const gombUrlap = document.createElement('button'); // Létrehozunk egy új 'button' elemet
+gombUrlap.textContent = 'hozzáadás'; // Beállítjuk a gomb szövegét 'hozzáadás'-ra
+urlapSim.appendChild(gombUrlap) // Hozzáadjuk a gombot az űrlaphoz
 
 kontenerDiv.appendChild(tablaDiv); // A konténer div-hez hozzáadjuk a tablaDiv-et
 kontenerDiv.appendChild(urlapDiv); // A konténer div-hez hozzáadjuk az urlapDiv-et is
