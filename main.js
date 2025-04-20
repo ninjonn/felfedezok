@@ -18,10 +18,10 @@ const tablaSim = document.createElement('table'); // Létrehozunk egy új 'table
 tablaDiv.appendChild(tablaSim); // Hozzáadjuk a tablaSim-t a tablaDiv-hez
 const tablaFejlec = document.createElement('thead'); // Létrehozunk egy új 'thead' elemet, ami a táblázat fejlécét képviseli
 tablaSim.appendChild(tablaFejlec); // Hozzáadjuk a 'thead' elemet a táblázathoz
-const tablaFejSor =  document.createElement('tr'); // Létrehozunk egy új 'tr' elemet, ami a táblázat fejlécének sorát képviseli
+const tablaFejSor = document.createElement('tr'); // Létrehozunk egy új 'tr' elemet, ami a táblázat fejlécének sorát képviseli
 tablaFejlec.appendChild(tablaFejSor) // Létrehozunk egy új 'tr' elemet, ami a táblázat fejlécének sorát képviseli
 const theadCella = ['név', 'szolgálat', 'évszám', 'felfedezés']; // Létrehozunk egy tömböt, ami a fejléc celláinak tartalmát tárolja
-for(const cellaTartalom of theadCella){ // Végigiterálunk a theadCella tömb elemein
+for (const cellaTartalom of theadCella) { // Végigiterálunk a theadCella tömb elemein
     const thcella = document.createElement('th'); // Létrehozunk egy új 'th' elemet, ami a táblázat fejlécének cellája lesz
     thcella.innerText = cellaTartalom; // Beállítjuk a cella szövegét a cellaTartalom változó értékére
     tablaFejSor.appendChild(thcella); // Hozzáadjuk a cellát a fejléc sorhoz
@@ -50,17 +50,21 @@ const mezoLista = [{ // Létrehozunk egy tömböt, ami a mezőket tárolja
     mezocimke: 'felfedezés' // A mező címkéje
 }]
 
-for(const mezoElem of mezoLista){ // Végigiterálunk a mezoElemLista tömb elemein
+for (const mezoElem of mezoLista) { // Végigiterálunk a mezoElemLista tömb elemein
     const mezo = csinalDiv('field'); // Meghívjuk a csinalDiv függvényt 'field' osztálynévvel, és eltároljuk az eredményt mezo néven
     urlapSim.appendChild(mezo); // Hozzáadjuk a mezo-t a urlapSim-hez
     const cimke = document.createElement('label'); // Létrehozunk egy új 'label' elemet
     cimke.htmlFor = mezoElem.mezoid; // Beállítjuk a címke htmlFor attribútumát a mező azonosítójára
     cimke.textContent = mezoElem.mezocimke; // Beállítjuk a címke szövegét a mező címkéjére
     mezo.appendChild(cimke) // Hozzáadjuk a címkét a mezőhöz
+    mezo.appendChild(document.createElement('br')) // Hozzáadunk egy új 'br' elemet a mezőhöz, hogy új sort hozzunk létre
     const input = document.createElement('input'); // Létrehozunk egy új 'input' elemet
     input.id = mezoElem.mezoid; // Beállítjuk az input azonosítóját a mező azonosítójára
-    mezo.appendChild(document.createElement('br')) // Hozzáadunk egy új 'br' elemet a mezőhöz, hogy új sort hozzunk létre
     mezo.appendChild(input) // Hozzáadjuk az input elemet a mezőhöz
+    mezo.appendChild(document.createElement('br')) // Hozzáadunk egy új 'br' elemet a mezőhöz, hogy új sort hozzunk létre
+    const hiba = document.createElement('span'); // Létrehozunk egy új 'span' elemet, ami a hibaüzenetet fogja tárolni
+    hiba.className = 'hiba'; // Beállítjuk a hibaüzenet osztályát 'hiba'-ra
+    mezo.appendChild(hiba); // Hozzáadjuk a hibaüzenetet a mezőhöz
 }
 
 const gombUrlap = document.createElement('button'); // Létrehozunk egy új 'button' elemet
@@ -77,28 +81,39 @@ urlapSim.addEventListener('submit', (e) => { // Hozzáadunk egy eseményfigyelő
     e.preventDefault(); // Megakadályozzuk az űrlap alapértelmezett viselkedését
     const ertekObject = {} // Létrehozunk egy üres objektumot, ami a mezők értékeit tárolja
     const bemenetiMezok = e.target.querySelectorAll('input'); // Kiválasztjuk az összes bemeneti mezőt az űrlapon
-    for(const bemenetiMezo of bemenetiMezok){ // Végigiterálunk a bemeneti mezőkön
-        ertekObject[bemenetiMezo.id] = bemenetiMezo.value; // Beállítjuk az objektum kulcsait a mezők azonosítójára, és értékeit a mezők értékére
+    let mutat = true; // Létrehozunk egy változót, ami jelzi, hogy a mezők értékei érvényesek-e
+    for (const bemenetiMezo of bemenetiMezok) { // Végigiterálunk a bemeneti mezőkön
+        const hibaElem = bemenetiMezo.parentElement.querySelector('.hiba'); // Kiválasztjuk a hibaüzenetet a mező szülőeleméből
+        hibaElem.textContent = ''; // Töröljük a hibaüzenetet
+        if (bemenetiMezo.value === '') { // Ha a mező értéke üres
+            hibaElem.textContent = 'Kötelező mező'; // Beállítjuk a hibaüzenetet
+            mutat = false; // Beállítjuk a mutat változót hamisra
+        } else { // Ha a mező értéke nem üres
+            ertekObject[bemenetiMezo.id] = bemenetiMezo.value; // Hozzáadjuk az objektumhoz a mező azonosítóját és értékét
+        }
     }
-    tomb.push(ertekObject); // Hozzáadjuk az objektumot a tomb tömbhöz
-    const tablaTestSor = document.createElement('tr'); // Létrehozunk egy új 'tr' elemet, ami a táblázat törzsében egy sort képvisel
-    tablaTest.appendChild(tablaTestSor); // Hozzáadjuk a sort a táblázat törzséhez
-    
-    const nevCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
-    nevCella.textContent = ertekObject.nev; // Beállítjuk a cella szövegét az objektum 'nev' kulcsának értékére
-    tablaTestSor.appendChild(nevCella); // Hozzáadjuk a cellát a sorhoz
 
-    const szolgalatCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
-    szolgalatCella.textContent = ertekObject.szolgalat; // Beállítjuk a cella szövegét az objektum 'szolgalat' kulcsának értékére
-    tablaTestSor.appendChild(szolgalatCella); // Hozzáadjuk a cellát a sorhoz
+    if (mutat) { // Ha a mutat változó hamis
+        tomb.push(ertekObject); // Hozzáadjuk az objektumot a tomb tömbhöz
+        const tablaTestSor = document.createElement('tr'); // Létrehozunk egy új 'tr' elemet, ami a táblázat törzsében egy sort képvisel
+        tablaTest.appendChild(tablaTestSor); // Hozzáadjuk a sort a táblázat törzséhez
 
-    const evszamCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
-    evszamCella.textContent = ertekObject.evszam; // Beállítjuk a cella szövegét az objektum 'evszam' kulcsának értékére
-    tablaTestSor.appendChild(evszamCella); // Hozzáadjuk a cellát a sorhoz
+        const nevCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
+        nevCella.textContent = ertekObject.nev; // Beállítjuk a cella szövegét az objektum 'nev' kulcsának értékére
+        tablaTestSor.appendChild(nevCella); // Hozzáadjuk a cellát a sorhoz
 
-    const felfedezesCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
-    felfedezesCella.textContent = ertekObject.felfedezes; // Beállítjuk a cella szövegét az objektum 'felfedezes' kulcsának értékére
-    tablaTestSor.appendChild(felfedezesCella); // Hozzáadjuk a cellát a sorhoz
+        const szolgalatCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
+        szolgalatCella.textContent = ertekObject.szolgalat; // Beállítjuk a cella szövegét az objektum 'szolgalat' kulcsának értékére
+        tablaTestSor.appendChild(szolgalatCella); // Hozzáadjuk a cellát a sorhoz
+
+        const evszamCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
+        evszamCella.textContent = ertekObject.evszam; // Beállítjuk a cella szövegét az objektum 'evszam' kulcsának értékére
+        tablaTestSor.appendChild(evszamCella); // Hozzáadjuk a cellát a sorhoz
+
+        const felfedezesCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
+        felfedezesCella.textContent = ertekObject.felfedezes; // Beállítjuk a cella szövegét az objektum 'felfedezes' kulcsának értékére
+        tablaTestSor.appendChild(felfedezesCella); // Hozzáadjuk a cellát a sorhoz
+    }
 })
 
 kontenerDiv.appendChild(tablaDiv); // A konténer div-hez hozzáadjuk a tablaDiv-et
