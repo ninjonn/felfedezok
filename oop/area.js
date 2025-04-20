@@ -135,6 +135,11 @@ class Tablazat extends Terulet {
  */
 class Urlap extends Terulet {
     /**
+     * @type {HTMLFormElement}
+    */
+    #urlapMezoTomb; // A #urlapMezoTomb egy privát mező, amely a létrehozott űrlap mezőit tárolja
+
+    /**
      * Létrehoz egy új `Urlap` példányt.
      * Az űrlap mezőket és egy gombot hoz létre, majd hozzáadja azokat a konténerhez.
      * @param {string} cssOsztaly - Az osztály neve, amelyet a létrehozott div elemhez rendelünk.
@@ -143,20 +148,14 @@ class Urlap extends Terulet {
      */
     constructor(cssOsztaly, mezoLista, manager) { 
         super(cssOsztaly, manager); // Meghívja a szülő osztály konstruktorát, hogy létrehozza a div elemet
+        this.#urlapMezoTomb = []; // Inicializálja a #urlapMezoTomb tömböt
         const urlap = document.createElement('form'); // Létrehoz egy új 'form' elemet
         this.div.appendChild(urlap); // Hozzáadja az űrlapot a div-hez
         
         for (const mezoElem of mezoLista) { // Végigiterálunk a mezoElemLista tömb elemein
-            const mezo = csinalDiv('field'); // Meghívjuk a csinalDiv függvényt 'field' osztálynévvel, és eltároljuk az eredményt mezo néven
-            urlap.appendChild(mezo); // Hozzáadjuk a mezo-t az űrlaphoz
-            const cimke = document.createElement('label'); // Létrehozunk egy új 'label' elemet
-            cimke.htmlFor = mezoElem.mezoid; // Beállítjuk a címke htmlFor attribútumát a mező azonosítójára
-            cimke.textContent = mezoElem.mezocimke; // Beállítjuk a címke szövegét a mező címkéjére
-            mezo.appendChild(cimke) // Hozzáadjuk a címkét a mezőhöz
-            const input = document.createElement('input'); // Létrehozunk egy új 'input' elemet
-            input.id = mezoElem.mezoid; // Beállítjuk az input azonosítóját a mező azonosítójára
-            mezo.appendChild(document.createElement('br')) // Hozzáadunk egy új 'br' elemet a mezőhöz, hogy új sort hozzunk létre
-            mezo.appendChild(input) // Hozzáadjuk az input elemet a mezőhöz
+            const mezo = new UrlapMezo(mezoElem.mezoid, mezoElem.mezocimke); // Létrehozunk egy új UrlapMezo példányt a mező azonosítójával és címkéjével
+            this.#urlapMezoTomb.push(mezo); // Hozzáadjuk a mezőt a #urlapMezoTomb tömbhöz
+            urlap.appendChild(mezo.divMeghiv()); // Hozzáadjuk a mezőt az űrlaphoz
         }
         const gomb = document.createElement('button'); // Létrehozunk egy új 'button' elemet
         gomb.textContent = 'hozzáadás'; // Beállítjuk a gomb szövegét 'hozzáadás'-ra
@@ -180,5 +179,82 @@ class Urlap extends Terulet {
             const explore = new Explore(ertekObject.nev, ertekObject.szolgalat, Number(ertekObject.evszam), ertekObject.felfedezes); // Létrehoz egy új Explore példányt a megadott értékekkel
             this.manager.addExplore(explore); // Hozzáadja az Explore példányt a managerhez
         })
+    }
+}
+
+/**
+ * A `UrlapMezo` osztály egy űrlap mezőt reprezentál, amely tartalmaz egy címkét, egy bemeneti mezőt és egy hibaüzenetet.
+ */
+class UrlapMezo {
+    /**
+     * @type {string}
+     */
+    #id; // A #id egy privát mező, amely a mező azonosítóját tárolja
+
+    /** 
+     * @type {HTMLInputElement}
+     */
+    #bemenetiMezo; // A #bemenetiMezo egy privát mező, amely a bemeneti mezőt tárolja
+     
+    /**
+     * @type {HTMLLabelElement}
+     */
+    #cimkeElem; // A #cimkeElem egy privát mező, amely a címkét tárolja
+
+    /**
+     * @type {HTMLSpanElement}
+     */
+    #hibaElem; // A #hibaElem egy privát mező, amely a hibaüzenetet tárolja
+
+    /**
+     * @returns {string} - A mező azonosítója
+     */
+    get id(){
+        return this.#id; // Getter metódus, amely visszaadja a #id mező értékét
+    }
+
+    /**
+     * @returns {HTMLInputElement} - A bemeneti mező
+     */
+    get ertek(){
+        return this.#bemenetiMezo.value; // Getter metódus, amely visszaadja a bemeneti mező értékét
+    }
+
+    /**
+     * @returns {HTMLLabelElement} - A címke elem
+     */
+    set hiba(ertek){
+        this.#hibaElem.textContent = ertek; // Setter metódus, amely beállítja a hibaüzenetet
+    }
+
+    /**
+     * Létrehoz egy új `UrlapMezo` példányt.
+     * @param {string} id - A mező azonosítója.
+     * @param {string} cimkeTartalom - A mező címkéje.
+     */
+    constructor(id, cimkeTartalom) { // Az osztály konstruktora, ami egy azonosítót és egy címkét vár paraméterként
+        this.#id = id; // Inicializálja a #id mezőt
+        this.#cimkeElem = document.createElement('label'); // Létrehoz egy új 'label' elemet
+        this.#cimkeElem.htmlFor = id; // Beállítja a címke htmlFor attribútumát a mező azonosítójára
+        this.#cimkeElem.textContent = cimkeTartalom; // Beállítja a címke szövegét a mező címkéjére
+        this.#bemenetiMezo = document.createElement('input'); // Létrehoz egy új 'input' elemet
+        this.#bemenetiMezo.id = id; // Beállítja az input azonosítóját a mező azonosítójára
+        this.#hibaElem = document.createElement('span'); // Létrehoz egy új 'span' elemet, ami a hibaüzenetet fogja tárolni
+        this.#hibaElem.className = 'hiba'; // Beállítja a hibaüzenet osztályát 'hiba'-ra
+    }
+
+    /**
+     * Létrehoz egy új div elemet, amely tartalmazza a címkét, a bemeneti mezőt és a hibaüzenetet.
+     * @returns {HTMLDivElement} - A létrehozott div elem
+     */
+    divMeghiv(){
+        const div = csinalDiv('field'); // Meghívja a csinalDiv függvényt 'field' osztálynévvel, és eltárolja az eredményt div néven
+        const br1 = document.createElement('br') // Létrehoz egy új 'br' elemet, hogy új sort hozzon létre
+        const br2 = document.createElement('br') // Létrehoz egy új 'br' elemet, hogy új sort hozzon létre
+        const htmlElemek = [this.#cimkeElem, br1, this.#bemenetiMezo, br2, this.#hibaElem]; // Létrehoz egy tömböt, amely tartalmazza a címkét, a bemeneti mezőt és a hibaüzenetet
+        for(const elem of htmlElemek){ // Végigiterál a htmlElemek tömb elemein
+            div.appendChild(elem);  // Hozzáadja az elemeket a div-hez
+        }
+        return div; // Visszaadja a létrehozott div elemet
     }
 }
