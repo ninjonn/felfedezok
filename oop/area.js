@@ -171,13 +171,22 @@ class Urlap extends Terulet {
         */
         urlap.addEventListener('submit', (e)=> {
             e.preventDefault(); // Megakadályozza az űrlap alapértelmezett elküldését
-            const bemenetiMezokLista = e.target.querySelectorAll('input'); // Megkeresi az összes bemeneti mezőt az űrlapon
             const ertekObject = {}; // Létrehoz egy üres objektumot, amelybe a mezők értékeit fogja tárolni
-            for(const bemenetiMezo of bemenetiMezokLista){ // Végigiterál a bemeneti mezők listáján
-                ertekObject[bemenetiMezo.id] = bemenetiMezo.value; // Beállítja az objektum kulcsait a mezők azonosítójára, és értékeit a mezők értékére
+            let mutat = true; // Létrehoz egy változót, amely jelzi, hogy a mezők értékei érvényesek-e
+            for(const bemenetiMezo of this.#urlapMezoTomb){ // Végigiterál a bemeneti mezők listáján
+                bemenetiMezo.hiba = ''; // Törli a hibaüzenetet
+                if(bemenetiMezo.ertek === ''){ // Ha a mező értéke üres
+                    bemenetiMezo.hiba = 'Kötelező mező'; // Beállítja a hibaüzenetet
+                    mutat = false; // A mező értéke nem érvényes
+                } else{
+                    ertekObject[bemenetiMezo.id] = bemenetiMezo.ertek; // Beállítja az objektum kulcsait a mezők azonosítójára, és értékeit a mezők értékére
+
+                }
             }
-            const explore = new Explore(ertekObject.nev, ertekObject.szolgalat, Number(ertekObject.evszam), ertekObject.felfedezes); // Létrehoz egy új Explore példányt a megadott értékekkel
-            this.manager.addExplore(explore); // Hozzáadja az Explore példányt a managerhez
+            if(mutat){ // Ha a mezők értékei érvényesek
+                const explore = new Explore(ertekObject.nev, ertekObject.szolgalat, Number(ertekObject.evszam), ertekObject.felfedezes); // Létrehoz egy új Explore példányt a megadott értékekkel
+                this.manager.addExplore(explore); // Hozzáadja az Explore példányt a managerhez
+            }
         })
     }
 }
