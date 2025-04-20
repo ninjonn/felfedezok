@@ -195,7 +195,7 @@ class Urlap extends Terulet {
  * A `Feltoltes` osztály egy fájl feltöltésére szolgáló elemet hoz létre.
  * @extends Terulet
  */
-class Feltoltes extends Terulet {
+class FeltoltesLetoltes extends Terulet {
     /**
      * Létrehoz egy új `Feltoltes` példányt.
      * @param {string} cssClass - Az osztály neve, amelyet a létrehozott div elemhez rendelünk.
@@ -228,6 +228,23 @@ class Feltoltes extends Terulet {
                }
             }
             fajlBeolvaso.readAsText(fajl); // Beolvassa a fájlt szövegként
+        })
+
+        const letoltesGomb = document.createElement('button'); // Létrehoz egy új 'button' elemet
+        letoltesGomb.textContent = 'Letöltés'; // Beállítja a gomb szövegét 'Letöltés'-re
+        this.div.appendChild(letoltesGomb); // Hozzáadja a gombot a div-hez
+        /**
+         * Eseményfigyelő a letöltés gombra.
+         * @param {MouseEvent} e - Az esemény objektum, amely a gombra kattintáskor keletkezik
+         */
+        letoltesGomb.addEventListener('click', () => { 
+            const link = document.createElement('a'); // Létrehoz egy új 'a' elemet, amely a letöltéshez szükséges
+            const tartalom = this.manager.letoltesTomb(); // Meghívja a manager letöltésTomb metódusát, hogy megkapja a fájl tartalmát
+            const fajl = new Blob([tartalom], { type: 'text/csv' }); // Létrehoz egy új Blob objektumot a fájl tartalmával és a megfelelő MIME típussal
+            link.href = URL.createObjectURL(fajl); // Beállítja a link href attribútumát a Blob objektum URL-jére
+            link.download = 'newdata.csv'; // Beállítja a letöltési fájl nevét 'newdata.csv'-ra
+            link.click(); // Kattint a linkre, hogy letöltse a fájlt
+            URL.revokeObjectURL(link.href); // Visszavonja a Blob objektum URL-jét, hogy felszabadítsa a memóriát
         })
     }
 }
