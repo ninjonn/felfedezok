@@ -118,3 +118,50 @@ urlapSim.addEventListener('submit', (e) => { // Hozzáadunk egy eseményfigyelő
 
 kontenerDiv.appendChild(tablaDiv); // A konténer div-hez hozzáadjuk a tablaDiv-et
 kontenerDiv.appendChild(urlapDiv); // A konténer div-hez hozzáadjuk az urlapDiv-et is
+
+const fajlInput = document.createElement('input') // Létrehozunk egy új 'input' elemet, ami a fájl kiválasztására szolgál
+kontenerDiv.appendChild(fajlInput); // A konténer div-hez hozzáadjuk a fájl inputot
+fajlInput.id='fajlInput' // Beállítjuk a fájl input azonosítóját 'fajlInput'-ra
+fajlInput.type = 'file'; // Beállítjuk a fájl input típusát 'file'-ra
+/**
+ * Eseményfigyelő a fájl input 'change' eseményére
+ * @param {Event} e - Az esemény objektum, amely a 'change' eseményhez tartozik
+ */
+fajlInput.addEventListener('change', (e) => { 
+    const fajl = e.target.files[0]; // Kiválasztjuk a fájlt az inputból
+    const fajlBeolvaso = new FileReader(); // Létrehozunk egy új FileReader objektumot, ami a fájl beolvasására szolgál
+    fajlBeolvaso.onload = () => { // Beállítjuk a fájl beolvasásának eseményfigyelőjét
+       const fileLines = fajlBeolvaso.result.split('\n') // A fájl tartalmát sorokra bontjuk
+       const fejlecTorles = fileLines.slice(1); // Az első sort eltávolítjuk, mert az a fejléc
+       for(const sor of fejlecTorles){ // Végigiterálunk a fájl sorain
+            const tagoltSor = sor.trim(); // Eltávolítjuk a felesleges szóközöket a sor elejéről és végéről
+            const mezok = tagoltSor.split(';'); // A sort mezőkre bontjuk a pontosvesszők mentén
+            const felfedezesek = { // Létrehozunk egy új objektumot, ami a felfedezéseket tárolja
+                nev: mezok[0], // A felfedező neve
+                szolgalat: mezok[1], // A felfedező szolgálata
+                evszam: mezok[2], // A felfedezés évszáma
+                felfedezes: mezok[3] // A felfedezés neve
+            }
+            tomb.push(felfedezesek); // Hozzáadjuk az objektumot a tomb tömbhöz
+            const tableTestSor = document.createElement('tr'); // Létrehozunk egy új 'tr' elemet, ami a táblázat törzsében egy sort képvisel
+            tablaTest.appendChild(tableTestSor); // Hozzáadjuk a sort a táblázat törzséhez
+            
+            const nevCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
+            nevCella.textContent = felfedezesek.nev; // Beállítjuk a cella szövegét az objektum 'nev' kulcsának értékére
+            tableTestSor.appendChild(nevCella); // Hozzáadjuk a cellát a sorhoz
+        
+            const szolgalatCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
+            szolgalatCella.textContent = felfedezesek.szolgalat; // Beállítjuk a cella szövegét az objektum 'szolgalat' kulcsának értékére
+            tableTestSor.appendChild(szolgalatCella); // Hozzáadjuk a cellát a sorhoz
+        
+            const evszamCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
+            evszamCella.textContent = felfedezesek.evszam; // Beállítjuk a cella szövegét az objektum 'evszam' kulcsának értékére
+            tableTestSor.appendChild(evszamCella); // Hozzáadjuk a cellát a sorhoz
+
+            const felfedezesCella = document.createElement('td'); // Létrehozunk egy új 'td' elemet, ami a táblázat törzsében egy cellát képvisel
+            felfedezesCella.textContent = felfedezesek.felfedezes; // Beállítjuk a cella szövegét az objektum 'felfedezes' kulcsának értékére
+            tableTestSor.appendChild(felfedezesCella); // Hozzáadjuk a cellát a sorhoz
+       }
+    }
+    fajlBeolvaso.readAsText(fajl); // Beolvassuk a fájlt szövegként
+})
