@@ -19,3 +19,4 @@ const mezokLista = [{ // Létrehozunk egy tömböt, ami a mezőket tárolja
 const manager = new Manager(); // A Manager osztály példányosítása, létrehozva egy új menedzsert
 const tabla = new Tablazat('table', manager); // A Tablazat osztály példányosítása, létrehozva egy új 'table' osztályú elemet
 const urlap = new Urlap('form', mezokLista, manager); // Az Urlap osztály példányosítása, létrehozva egy új 'form' osztályú elemet
+const fajlFeltoltes = new Feltoltes('file', manager); // A FajlFeltoltes osztály példányosítása, létrehozva egy új 'file' osztályú elemet

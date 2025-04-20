@@ -192,6 +192,47 @@ class Urlap extends Terulet {
 }
 
 /**
+ * A `Feltoltes` osztály egy fájl feltöltésére szolgáló elemet hoz létre.
+ * @extends Terulet
+ */
+class Feltoltes extends Terulet {
+    /**
+     * Létrehoz egy új `Feltoltes` példányt.
+     * @param {string} cssClass - Az osztály neve, amelyet a létrehozott div elemhez rendelünk.
+     * @param {Manager} manager - A manager példány, amelyet a feltöltéshez rendelünk.
+     */
+    constructor(cssClass, manager){
+        super(cssClass, manager); // Meghívja a szülő osztály konstruktorát, hogy létrehozza a div elemet
+        const bemenet = document.createElement('input') // Létrehoz egy új 'input' elemet
+        bemenet.id ='fajlinput'; // Beállítja az input azonosítóját 'fajlinput'-ra
+        bemenet.type ='file' // Beállítja az input típusát 'file'-ra
+        this.div.appendChild(bemenet); // Hozzáadja az inputot a div-hez
+        
+        /**
+         * Eseményfigyelő a fájl kiválasztására.
+         * Amikor a felhasználó kiválaszt egy fájlt, beolvassa a fájl tartalmát,
+         * és létrehoz egy új `Explore` példányt a fájl sorainak adataival.
+         * @param {Event} e - Az esemény objektum, amely a fájl kiválasztásához tartozik
+         */
+        bemenet.addEventListener('change', (e)=>{  
+            const fajl = e.target.files[0]; // Megkapja a kiválasztott fájlt
+            const fajlBeolvaso = new FileReader(); // Létrehoz egy új FileReader példányt, amely a fájl beolvasására szolgál
+            fajlBeolvaso.onload = () => { // Amikor a fájl beolvasása befejeződik
+               const fajlSorok = fajlBeolvaso.result.split('\n') // A fájl tartalmát sorokra bontja
+               const fejlecTorles = fajlSorok.slice(1); // Eltávolítja az első sort a fájl sorainak listájából
+               for(const sor of fejlecTorles){ // Végigiterál a fájl sorain
+                    const tagoltSor = sor.trim(); // Eltávolítja a felesleges szóközöket a sor elejéről és végéről
+                    const mezok = tagoltSor.split(';'); // A sort pontosvesszők mentén tagolja
+                    const felfedezes = new Explore(mezok[0], mezok[1], Number(mezok[2]), mezok[3]); // Létrehoz egy új Explore példányt a megadott értékekkel
+                    this.manager.addExplore(felfedezes) // Hozzáadja az Explore példányt a managerhez
+               }
+            }
+            fajlBeolvaso.readAsText(fajl); // Beolvassa a fájlt szövegként
+        })
+    }
+}
+
+/**
  * A `UrlapMezo` osztály egy űrlap mezőt reprezentál, amely tartalmaz egy címkét, egy bemeneti mezőt és egy hibaüzenetet.
  */
 class UrlapMezo {
