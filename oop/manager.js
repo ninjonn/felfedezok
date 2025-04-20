@@ -1,18 +1,18 @@
 /**
  * A `Manager` osztály felelős a felfedezések kezeléséért és a callback-ek kezeléséért
  */
-class Manager { 
+class Manager {
     /**
      * @type {Array<Object>} - A felfedezések tárolására szolgáló tömb
      * @private
      */
-    #tomb; 
+    #tomb;
 
     /**
      * @type {AddExploreCallback} - A callback függvény, amelyet új felfedezés hozzáadásakor hív meg
      * @private
      */
-    #addExploreCallback; 
+    #addExploreCallback;
 
     /**
      * Létrehoz egy új `Manager` példányt

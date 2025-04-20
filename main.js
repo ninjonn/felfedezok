@@ -165,3 +165,25 @@ fajlInput.addEventListener('change', (e) => {
     }
     fajlBeolvaso.readAsText(fajl); // Beolvassuk a fájlt szövegként
 })
+
+const letoltesGomb = document.createElement('button'); // Létrehozunk egy új 'button' elemet, ami a fájl letöltésére szolgál
+letoltesGomb.textContent = 'Letöltés'; // Beállítjuk a gomb szövegét 'Letöltés'-re
+kontenerDiv.appendChild(letoltesGomb); // A konténer div-hez hozzáadjuk a letöltés gombot
+
+/**
+ * Eseményfigyelő a letöltés gomb 'click' eseményére
+ * @param {MouseEvent} e - Az esemény objektum, amely a 'click' eseményhez tartozik
+ */
+letoltesGomb.addEventListener('click', () => {
+    const link = document.createElement('a'); // Létrehozunk egy új 'a' elemet, ami a fájl letöltésére szolgál
+    const tartalomTomb = ['nev;szolgalat;evszam;felfedezes']; // Létrehozunk egy tömböt, ami a fájl tartalmát tárolja, az első elem a fejléc
+    for(const felfedezes of tomb){ // Végigiterálunk a felfedezések tömb elemein
+        tartalomTomb.push(`${felfedezes.nev};${felfedezes.szolgalat};${felfedezes.evszam};${felfedezes.felfedezes}`); // Hozzáadjuk a felfedezés adatait a tartalom tömbhöz, pontosvesszővel elválasztva
+    }
+    const tartalom = tartalomTomb.join('\n'); // A tartalom tömböt egyetlen szöveggé alakítjuk, ahol a sorokat új sorral választjuk el
+    const fajl = new Blob([tartalom], { type: 'text/csv' }) // Létrehozunk egy új Blob objektumot, ami a fájl tartalmát tárolja, és beállítjuk a típusát 'text/csv'-ra
+    link.href = URL.createObjectURL(fajl); // Beállítjuk a link href attribútumát a Blob objektum URL-jére
+    link.download = 'newdata.csv' // Beállítjuk a letöltési fájl nevét 'newdata.csv'-ra
+    link.click(); // Kattintunk a linkre, hogy elindítsuk a letöltést
+    URL.revokeObjectURL(link.href); // Visszavonjuk a Blob objektum URL-jét, hogy felszabadítsuk a memóriát
+})
