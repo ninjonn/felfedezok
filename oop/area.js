@@ -1,4 +1,9 @@
 /**
+ * @callback AddExploreCallback
+ * @param {Explore} explore - Az új felfedezés
+ */
+
+/**
  * A `Terulet` osztály egy HTML elemet hoz létre és hozzáadja azt egy konténerhez.
  */
 class Terulet {
@@ -39,7 +44,7 @@ class Terulet {
         this.#div.className = osztalyNev; // Beállítjuk a div osztályát a konstruktorban kapott paraméter alapján
         kontener.appendChild(this.#div); // Hozzáadjuk a létrehozott div-et a konténerhez
         }
-    
+
     /**
      * Privát metódus, amely visszaadja a konténer div-et.
      * @returns {HTMLDivElement} - A konténer div elem
@@ -61,71 +66,79 @@ class Terulet {
  */
 class Tablazat extends Terulet {
     /**
-     * @type {HTMLTableElement}
-     * @param {Manager} manager - A menedzser példány, amelyet a táblázathoz rendelünk.
+     * Létrehoz egy új `Tablazat` példányt.
+     * @param {string} cssOsztaly - A CSS osztály neve, amelyet a táblázathoz rendelünk.
+     * @param {Manager} manager - A manager példány, amely a felfedezések kezeléséért felelős
      */
-    constructor(cssOsztaly, manager) { // Az osztály konstruktora, ami egy osztálynevet és egy manager-t vár paraméterként
-        super(cssOsztaly, manager); // Meghívja a szülő osztály konstruktorát, hogy létrehozza a div elemet
-        const tablaTest = this.#createTabla(); // Létrehoz egy új 'table' elemet
-
-        /**
-         * Callback függvény, amely egy új táblázatsort hoz létre és hozzáadja a táblázat törzséhez.
-         * 
-         * @callback AddExploreCallback
-         * @param {Object} exp - Az `Explore` példány, amely tartalmazza a felfedező adatait.
-         * @param {string} exp.nev - A felfedező neve.
-         * @param {string} exp.szolgalat - A felfedező szolgálata.
-         * @param {number} exp.evszam - A felfedezés évszáma.
-         * @param {string} exp.felfedezes - A felfedezés neve.
-         */
-
-        /**
-         * Beállítja az `AddExploreCallback` függvényt a manager számára.
-         * 
-         * @param {AddExploreCallback} callback - A callback függvény, amelyet a manager hív meg új `Explore` példány hozzáadásakor.
-         */
-        this.manager.setAddExploreCallback((exp) => {
-            const TablaTestSor = document.createElement('tr'); // Létrehoz egy új 'tr' elemet, ami a táblázat sorát képviseli
-            
-            const nevCella = document.createElement('td'); // Létrehoz egy új 'td' elemet, ami a táblázat celláját képviseli
-            nevCella.textContent = exp.nev; // Beállítja a cella szövegét a felfedező nevére
-            TablaTestSor.appendChild(nevCella); // Hozzáadja a cellát a táblázat sorához
-
-            const szolgalatCella = document.createElement('td'); // Létrehoz egy új 'td' elemet, ami a táblázat celláját képviseli
-            szolgalatCella.textContent = exp.szolgalat; // Beállítja a cella szövegét a felfedező szolgálatára
-            TablaTestSor.appendChild(szolgalatCella); // Hozzáadja a cellát a táblázat sorához
-
-            const evszamCella = document.createElement('td'); // Létrehoz egy új 'td' elemet, ami a táblázat celláját képviseli
-            evszamCella.textContent = exp.evszam; // Beállítja a cella szövegét a felfedező évszámára
-            TablaTestSor.appendChild(evszamCella); // Hozzáadja a cellát a táblázat sorához
-
-            const felfedezesCella = document.createElement('td'); // Létrehoz egy új 'td' elemet, ami a táblázat celláját képviseli
-            felfedezesCella.textContent = exp.felfedezes; // Beállítja a cella szövegét a felfedezés nevére
-            TablaTestSor.appendChild(felfedezesCella); // Hozzáadja a cellát a táblázat sorához
-            tablaTest.appendChild(TablaTestSor); // Hozzáadja a táblázat sorát a táblázat törzséhez
-        })
+    constructor(cssOsztaly, manager) {
+        super(cssOsztaly, manager); // Meghívja a szülő osztály konstruktorát
+        const tablaTest = this.#createTabla(); // Létrehozza a táblázatot
+        this.#setAddExploreCallback(tablaTest); // Beállítja az új felfedezés hozzáadásának callback függvényét 
+        this.#setRenderTableCallback(tablaTest); // Beállítja a táblázat renderelésének callback függvényét
     }
 
     /**
-     * Létrehoz egy új táblázatot és visszaadja a törzsét.
-     * @returns {HTMLTableSectionElement} - A létrehozott táblázat törzse
-    */
-    #createTabla() { // Privát metódus, amely létrehozza a táblázatot
-        const tabla = document.createElement('table'); // Létrehoz egy új 'table' elemet
+     * Beállítja az új felfedezés hozzáadásának callback függvényét.
+     * @param {HTMLTableSectionElement} tablaTest - A táblázat törzs elem
+     * @type {AddExploreCallback} 
+     */
+    #setAddExploreCallback(tablaTest) {
+        this.manager.setAddExploreCallback((exp) => { // Beállítja a callback függvényt, amelyet új felfedezés hozzáadásakor hív meg
+            this.#createFelfedezesRow(exp, tablaTest); // Létrehozza a felfedezés sorát a táblázatban
+        });
+    }
+
+    /**
+     * Beállítja a táblázat renderelésének callback függvényét.
+     * @param {HTMLTableSectionElement} tablaTest - A táblázat törzs elem
+     */
+    #setRenderTableCallback(tablaTest) {
+        /** 
+         * @callback TableCallback
+         * @param {Array<Explore>} tomb - A felfedezések tömbje
+         */
+        this.manager.setRenderTableCallback((tomb) => { 
+            tablaTest.innerHTML = ''; // Törli a táblázat törzs tartalmát
+            tomb.forEach(felfedezes => { // Végigiterál a felfedezések tömbjén
+                this.#createFelfedezesRow(felfedezes, tablaTest); // Létrehozza a felfedezés sorát a táblázatban
+            });
+        });
+    }
+
+    /**
+     * Létrehozza a felfedezés sorát a táblázatban.
+     * @param {Explore} felfedezes - A felfedezés objektum
+     * @param {HTMLTableSectionElement} tablaTest - A táblázat törzs elem
+     */
+    #createFelfedezesRow(felfedezes, tableTest) {
+        const sor = document.createElement('tr'); // Létrehoz egy új sor elemet a táblázatban
+        ['nev', 'szolgalat', 'evszam', 'felfedezes'].forEach((kulcs) => { // Végigiterál a felfedezés kulcsain 
+            const cella = document.createElement('td'); // Létrehoz egy új cella elemet a táblázatban
+            cella.textContent = felfedezes[kulcs]; // Beállítja a cella szövegét a felfedezés kulcsának értékére
+            sor.appendChild(cella); // Hozzáadja a cellát a sorhoz 
+        });
+        tableTest.appendChild(sor); // Hozzáadja a sort a táblázat törzséhez 
+    }
+
+    /**
+     * Létrehozza a táblázatot és visszaadja a táblázat törzs elemét.
+     * @returns {HTMLTableSectionElement} - A táblázat törzs elem
+     */
+    #createTabla() {
+        const tabla = document.createElement('table'); // Létrehoz egy új táblázat elemet
         this.div.appendChild(tabla); // Hozzáadja a táblázatot a div-hez
-        const tablaFejlec = document.createElement('thead'); // Létrehoz egy új 'thead' elemet, ami a táblázat fejlécét képviseli
-        tabla.appendChild(tablaFejlec); // Hozzáadja a 'thead' elemet a táblázathoz
-        const tablaFejSor = document.createElement('tr'); // Létrehoz egy új 'tr' elemet, ami a táblázat fejlécének sorát képviseli
-        tablaFejlec.appendChild(tablaFejSor); // Hozzáadja a 'tr' elemet a fejléchez
-        const tablaFejCella = ['név', 'szolgálat', 'évszám', 'felfedezés']; // Létrehozunk egy tömböt, ami a fejléc celláinak tartalmát tárolja
-        for (const cellaTartalom of tablaFejCella) { // Végigiterálunk a fejléc celláinak tartalmán
-            const thCella = document.createElement('th'); // Létrehozunk egy új 'th' elemet, ami a táblázat fejlécének cellája lesz
-            thCella.innerText = cellaTartalom; // Beállítjuk a cella szövegét a cellaTartalom változó értékére
-            tablaFejSor.appendChild(thCella); // Hozzáadjuk a cellát a fejléc sorhoz
-        }
-        const tablaTest = document.createElement('tbody'); // Létrehozunk egy új 'tbody' elemet, ami a táblázat törzsét képviseli
-        tabla.appendChild(tablaTest); // Hozzáadjuk a 'tbody' elemet a táblázathoz
-        return tablaTest; // Visszaadja a táblázat törzsét
+        const tablaFejlec = document.createElement('thead'); // Létrehoz egy új táblázat fejléc elemet
+        tabla.appendChild(tablaFejlec); // Hozzáadja a fejlécet a táblázathoz
+        const tablaFejSor = document.createElement('tr'); // Létrehoz egy új fejléc sort
+        tablaFejlec.appendChild(tablaFejSor); // Hozzáadja a fejléc sort a fejléchez
+        ['Név', 'Szolgálat', 'Évszám', 'Felfedezés'].forEach(cimke => { // Végigiterál a fejléc címkéin
+            const thCella = document.createElement('th'); // Létrehoz egy új fejléc cellát
+            thCella.innerText = cimke; // Beállítja a fejléc cella szövegét
+            tablaFejSor.appendChild(thCella); // Hozzáadja a fejléc cellát a fejléc sorhoz
+        });
+        const tablaTest = document.createElement('tbody'); // Létrehoz egy új táblázat törzs elemet
+        tabla.appendChild(tablaTest); // Hozzáadja a törzset a táblázathoz
+        return tablaTest; // Visszaadja a táblázat törzs elemét
     }
 }
 
@@ -135,59 +148,78 @@ class Tablazat extends Terulet {
  */
 class Urlap extends Terulet {
     /**
-     * @type {HTMLFormElement}
-    */
-    #urlapMezoTomb; // A #urlapMezoTomb egy privát mező, amely a létrehozott űrlap mezőit tárolja
+     * @type {Array<UrlapMezo>} - A bemeneti mezők tömbje
+     * @private
+     */
+    #urlapMezoTomb; // A #urlapMezoTomb egy privát mező, amely a bemeneti mezőket tárolja
 
     /**
-     * Létrehoz egy új `Urlap` példányt.
-     * Az űrlap mezőket és egy gombot hoz létre, majd hozzáadja azokat a konténerhez.
-     * @param {string} cssOsztaly - Az osztály neve, amelyet a létrehozott div elemhez rendelünk.
-     * @param {Array<Object>} mezoLista - A mezők listája, amely tartalmazza az egyes mezők azonosítóját és címkéjét.
-     * @param {Manager} manager - A manager példány, amelyet a táblázathoz rendelünk.
+     * * Létrehoz egy új `Urlap` példányt.
+     * @param {string} cssOsztaly - A CSS osztály neve, amelyet az űrlaphoz rendelünk.
+     * @param {Array<string>} mezoLista - A bemeneti mezők listája, amely tartalmazza az azonosítót és a címkét.
+     * @param {Manager} manager - A manager példány, amely a felfedezések kezeléséért felelős
      */
-    constructor(cssOsztaly, mezoLista, manager) { 
-        super(cssOsztaly, manager); // Meghívja a szülő osztály konstruktorát, hogy létrehozza a div elemet
+    constructor(cssOsztaly, mezoLista, manager) {
+        super(cssOsztaly, manager); // Meghívja a szülő osztály konstruktorát
         this.#urlapMezoTomb = []; // Inicializálja a #urlapMezoTomb tömböt
-        const urlap = document.createElement('form'); // Létrehoz egy új 'form' elemet
-        this.div.appendChild(urlap); // Hozzáadja az űrlapot a div-hez
-        
-        for (const mezoElem of mezoLista) { // Végigiterálunk a mezoElemLista tömb elemein
-            const mezo = new UrlapMezo(mezoElem.mezoid, mezoElem.mezocimke); // Létrehozunk egy új UrlapMezo példányt a mező azonosítójával és címkéjével
-            this.#urlapMezoTomb.push(mezo); // Hozzáadjuk a mezőt a #urlapMezoTomb tömbhöz
-            urlap.appendChild(mezo.divMeghiv()); // Hozzáadjuk a mezőt az űrlaphoz
-        }
-        const gomb = document.createElement('button'); // Létrehozunk egy új 'button' elemet
-        gomb.textContent = 'hozzáadás'; // Beállítjuk a gomb szövegét 'hozzáadás'-ra
-        urlap.appendChild(gomb); // Hozzáadjuk a gombot az űrlaphoz
-        
-        /**
-         * Eseményfigyelő az űrlap 'submit' eseményére.
-         * Az űrlap beküldésekor megakadályozza az alapértelmezett viselkedést,
-         * összegyűjti a mezők értékeit, létrehoz egy új `Explore` példányt,
-         * és hozzáadja azt a managerhez.
-         * 
-         * @param {SubmitEvent} e - Az esemény objektum, amely a 'submit' eseményhez tartozik
-        */
-        urlap.addEventListener('submit', (e)=> {
-            e.preventDefault(); // Megakadályozza az űrlap alapértelmezett elküldését
-            const ertekObject = {}; // Létrehoz egy üres objektumot, amelybe a mezők értékeit fogja tárolni
-            let mutat = true; // Létrehoz egy változót, amely jelzi, hogy a mezők értékei érvényesek-e
-            for(const bemenetiMezo of this.#urlapMezoTomb){ // Végigiterál a bemeneti mezők listáján
-                bemenetiMezo.hiba = ''; // Törli a hibaüzenetet
-                if(bemenetiMezo.ertek === ''){ // Ha a mező értéke üres
-                    bemenetiMezo.hiba = 'Kötelező mező'; // Beállítja a hibaüzenetet
-                    mutat = false; // A mező értéke nem érvényes
-                } else{
-                    ertekObject[bemenetiMezo.id] = bemenetiMezo.ertek; // Beállítja az objektum kulcsait a mezők azonosítójára, és értékeit a mezők értékére
+        this.#createUrlap(mezoLista); // Létrehozza az űrlapot a megadott mezőlistával
+        this.#setSubmitEventListener(); // Beállítja az eseménykezelőt az űrlap elküldésére
+    }
 
-                }
+    /**
+     * Létrehozza az űrlapot a megadott mezőlistával.
+     * @param {Array<Object>} mezoLista - A bemeneti mezők listája, amely tartalmazza az azonosítót és a címkét.
+     */
+    #createUrlap(mezoLista) {
+        const urlap = document.createElement('form'); // Létrehoz egy új űrlap elemet
+        this.div.appendChild(urlap); // Hozzáadja az űrlapot a div-hez
+        mezoLista.forEach((mezoElem) => { // Végigiterál a mezőlistán
+            const mezo = new UrlapMezo(mezoElem.mezoid, mezoElem.mezocimke); // Létrehozza a mezőt az azonosító és a címke alapján
+            this.#urlapMezoTomb.push(mezo); // Hozzáadja a mezőt a mező tömbhöz
+            urlap.appendChild(mezo.divMeghiv()); // Hozzáadja a mezőt az űrlaphoz
+        });
+        const gomb = document.createElement('button'); // Létrehoz egy új gomb elemet az űrlaphoz
+        gomb.textContent = 'Hozzáadás'; // A gomb szövege
+        urlap.appendChild(gomb); // Hozzáadja a gombot az űrlaphoz
+    }
+
+    /**
+     * Beállítja az eseménykezelőt az űrlap elküldésére.
+     * @returns {EventListener}
+     */
+    #setSubmitEventListener() {
+        const urlap = this.div.querySelector('form'); // Megkeresi az űrlap elemet a div-ben
+        /**
+         * Eseménykezelő az űrlap elküldésére.
+         * @param {Event} e - Az esemény objektum
+         * @returns {EventListener}
+         */
+        urlap.addEventListener('submit', (e) => { 
+            e.preventDefault(); // Megakadályozza az űrlap alapértelmezett elküldését
+            this.#submitUrlap(); // Meghívja a #submitUrlap metódust az űrlap elküldésekor
+        });
+    }
+
+    /**
+     * Ellenőrzi az űrlap mezőit, és ha minden mező helyes, hozzáad egy új felfedezést a menedzserhez.
+     */
+    #submitUrlap() {
+        const ertekObject = {}; // Inicializál egy üres objektumot, amelybe a mezők értékeit tárolja
+        let mutat = true; // Inicializálja a mutat változót igazra, hogy ellenőrizze, hogy minden mező helyes-e
+        this.#urlapMezoTomb.forEach(bemenetiMezo => { // Végigiterál a bemeneti mezők tömbjén
+            bemenetiMezo.hiba = ''; // Törli a hibaüzenetet
+            if (bemenetiMezo.ertek === '') { // Ha a bemeneti mező értéke üres
+                bemenetiMezo.hiba = 'Kötelező mező'; // Beállítja a hibaüzenetet
+                mutat = false; // Beállítja a mutat változót hamisra, hogy jelezze, hogy nem minden mező helyes
+            } else { // Ha a bemeneti mező értéke nem üres 
+                ertekObject[bemenetiMezo.id] = bemenetiMezo.ertek; // Hozzáadja a mező értékét az objektumhoz a mező azonosítója alapján 
             }
-            if(mutat){ // Ha a mezők értékei érvényesek
-                const explore = new Explore(ertekObject.nev, ertekObject.szolgalat, Number(ertekObject.evszam), ertekObject.felfedezes); // Létrehoz egy új Explore példányt a megadott értékekkel
-                this.manager.addExplore(explore); // Hozzáadja az Explore példányt a managerhez
-            }
-        })
+        });
+
+        if (mutat) { // Ha minden mező helyes 
+            const explore = new Explore(ertekObject.nev, ertekObject.szolgalat, Number(ertekObject.evszam), ertekObject.felfedezes); // Létrehozza a felfedezést az objektumból
+            this.manager.addExplore(explore); // Hozzáadja a felfedezést a menedzserhez 
+        }
     }
 }
 
@@ -198,56 +230,95 @@ class Urlap extends Terulet {
 class FeltoltesLetoltes extends Terulet {
     /**
      * Létrehoz egy új `Feltoltes` példányt.
-     * @param {string} cssClass - Az osztály neve, amelyet a létrehozott div elemhez rendelünk.
-     * @param {Manager} manager - A manager példány, amelyet a feltöltéshez rendelünk.
+     * @param {string} cssClass - A CSS osztály neve, amelyet a fájl feltöltéséhez rendelünk.
+     * @param {Manager} manager - A manager példány, amely a felfedezések kezeléséért felelős
      */
-    constructor(cssClass, manager){
-        super(cssClass, manager); // Meghívja a szülő osztály konstruktorát, hogy létrehozza a div elemet
-        const bemenet = document.createElement('input') // Létrehoz egy új 'input' elemet
-        bemenet.id ='fajlinput'; // Beállítja az input azonosítóját 'fajlinput'-ra
-        bemenet.type ='file' // Beállítja az input típusát 'file'-ra
-        this.div.appendChild(bemenet); // Hozzáadja az inputot a div-hez
-        
-        /**
-         * Eseményfigyelő a fájl kiválasztására.
-         * Amikor a felhasználó kiválaszt egy fájlt, beolvassa a fájl tartalmát,
-         * és létrehoz egy új `Explore` példányt a fájl sorainak adataival.
-         * @param {Event} e - Az esemény objektum, amely a fájl kiválasztásához tartozik
-         */
-        bemenet.addEventListener('change', (e)=>{  
-            const fajl = e.target.files[0]; // Megkapja a kiválasztott fájlt
-            const fajlBeolvaso = new FileReader(); // Létrehoz egy új FileReader példányt, amely a fájl beolvasására szolgál
-            fajlBeolvaso.onload = () => { // Amikor a fájl beolvasása befejeződik
-               const fajlSorok = fajlBeolvaso.result.split('\n') // A fájl tartalmát sorokra bontja
-               const fejlecTorles = fajlSorok.slice(1); // Eltávolítja az első sort a fájl sorainak listájából
-               for(const sor of fejlecTorles){ // Végigiterál a fájl sorain
-                    const tagoltSor = sor.trim(); // Eltávolítja a felesleges szóközöket a sor elejéről és végéről
-                    const mezok = tagoltSor.split(';'); // A sort pontosvesszők mentén tagolja
-                    const felfedezes = new Explore(mezok[0], mezok[1], Number(mezok[2]), mezok[3]); // Létrehoz egy új Explore példányt a megadott értékekkel
-                    this.manager.addExplore(felfedezes) // Hozzáadja az Explore példányt a managerhez
-               }
-            }
-            fajlBeolvaso.readAsText(fajl); // Beolvassa a fájlt szövegként
-        })
+    constructor(cssClass, manager) {
+        super(cssClass, manager); // Meghívja a szülő osztály konstruktorát
+        this.#createFajlBemenet(); // Létrehozza a fájl bemeneti elemet
+        this.#setFajlKezeloListener(); // Beállítja a fájl kiválasztásának eseménykezelőjét 
+        this.#setDownloadListener(); // Beállítja a fájl letöltésének eseménykezelőjét
+    }
 
-        const letoltesGomb = document.createElement('button'); // Létrehoz egy új 'button' elemet
-        letoltesGomb.textContent = 'Letöltés'; // Beállítja a gomb szövegét 'Letöltés'-re
+    /**
+     * Létrehozza a fájl bemeneti elemet.
+     * @returns {HTMLInputElement} - A fájl bemeneti elem
+     */
+    #createFajlBemenet() {
+        const bemenet = document.createElement('input'); // Létrehoz egy új fájl bemeneti elemet
+        bemenet.id = 'fajlinput'; // Beállítja a bemeneti elem azonosítóját
+        bemenet.type = 'file'; // A bemeneti elem típusa fájl
+        this.div.appendChild(bemenet); // Hozzáadja a bemeneti elemet a div-hez
+    }
+
+    /**
+     * Beállítja a fájl kiválasztásának eseménykezelőjét.
+     * @returns {EventListener}
+     */
+    #setFajlKezeloListener() {
+        const bemenet = this.div.querySelector('#fajlinput'); // Megkeresi a fájl bemeneti elemet a div-ben
+        /**
+         * Eseménykezelő a fájl kiválasztására.
+         * @param {Event} e - Az esemény objektum
+         * @returns {EventListener}
+         */ 
+        bemenet.addEventListener('change', (e) => {
+            this.#fajlKezelo(e); // Meghívja a fájl kiválasztásának eseménykezelőjét
+        });
+    }
+
+    /**
+     * Feldolgozza a fájl kiválasztását és hozzáadja a felfedezéseket a menedzserhez.
+     * @param {Event} e - Az esemény objektum
+     * @returns {EventListener}
+     */
+    #fajlKezelo(e) {
+        const fajl = e.target.files[0]; // Megkapja a kiválasztott fájlt
+        const fajlBeolvaso = new FileReader(); // Létrehoz egy új FileReader objektumot
+        fajlBeolvaso.onload = () => { // Eseménykezelő, amely akkor hívódik meg, amikor a fájl beolvasása befejeződik
+            const fajlSorok = fajlBeolvaso.result.split('\n').slice(1); // A fájl tartalmát sorokra bontja és eltávolítja az első sort
+            fajlSorok.forEach(sor => { // Végigiterál a fájl sorain
+                const mezok = sor.trim().split(';'); // A sorokat mezőkre bontja
+                const felfedezes = new Explore(mezok[0], mezok[1], Number(mezok[2]), mezok[3]); // Létrehozza a felfedezést a mezők alapján
+                this.manager.addExplore(felfedezes); // Hozzáadja a felfedezést a menedzserhez
+            });
+        };
+        fajlBeolvaso.readAsText(fajl); // Beolvassa a fájlt szövegként
+    }
+
+    /**
+     * Beállítja a fájl letöltésének eseménykezelőjét.
+     * @returns {EventListener}
+     */
+    #setDownloadListener() {
+        const letoltesGomb = document.createElement('button'); // Létrehoz egy új gomb elemet a fájl letöltéséhez
+        letoltesGomb.textContent = 'Letöltés'; // A gomb szövege 
         this.div.appendChild(letoltesGomb); // Hozzáadja a gombot a div-hez
         /**
-         * Eseményfigyelő a letöltés gombra.
-         * @param {MouseEvent} e - Az esemény objektum, amely a gombra kattintáskor keletkezik
+         * Eseménykezelő a fájl letöltésére.
+         * @param {Event} e - Az esemény objektum
+         * @returns {EventListener}
          */
-        letoltesGomb.addEventListener('click', () => { 
-            const link = document.createElement('a'); // Létrehoz egy új 'a' elemet, amely a letöltéshez szükséges
-            const tartalom = this.manager.letoltesTomb(); // Meghívja a manager letöltésTomb metódusát, hogy megkapja a fájl tartalmát
-            const fajl = new Blob([tartalom], { type: 'text/csv' }); // Létrehoz egy új Blob objektumot a fájl tartalmával és a megfelelő MIME típussal
-            link.href = URL.createObjectURL(fajl); // Beállítja a link href attribútumát a Blob objektum URL-jére
-            link.download = 'newdata.csv'; // Beállítja a letöltési fájl nevét 'newdata.csv'-ra
-            link.click(); // Kattint a linkre, hogy letöltse a fájlt
-            URL.revokeObjectURL(link.href); // Visszavonja a Blob objektum URL-jét, hogy felszabadítsa a memóriát
-        })
+        letoltesGomb.addEventListener('click', () => {
+            this.#letoltesKezelo(); // Meghívja a fájl letöltésének eseménykezelőjét
+        });
+    }
+
+    /**
+     * Feldolgozza a fájl letöltését és létrehozza a letöltési linket.
+     * @returns {EventListener}
+     */
+    #letoltesKezelo() {
+        const link = document.createElement('a'); // Létrehoz egy új hivatkozás elemet a fájl letöltéséhez
+        const tartalom = this.manager.letoltesTomb(); // Megkapja a letöltendő fájl tartalmát a menedzsertől
+        const fajl = new Blob([tartalom], { type: 'text/csv' }); // Létrehoz egy új Blob objektumot a fájl tartalmával és típusával 
+        link.href = URL.createObjectURL(fajl); // Létrehozza a fájl URL-jét
+        link.download = 'newdata.csv'; // Beállítja a letöltési fájl nevét
+        link.click(); // Kattint a hivatkozásra, hogy letöltse a fájlt
+        URL.revokeObjectURL(link.href); // Visszavonja az URL-t, hogy felszabadítsa a memóriát
     }
 }
+
 
 /**
  * A `UrlapMezo` osztály egy űrlap mezőt reprezentál, amely tartalmaz egy címkét, egy bemeneti mezőt és egy hibaüzenetet.
@@ -262,7 +333,7 @@ class UrlapMezo {
      * @type {HTMLInputElement}
      */
     #bemenetiMezo; // A #bemenetiMezo egy privát mező, amely a bemeneti mezőt tárolja
-     
+
     /**
      * @type {HTMLLabelElement}
      */
@@ -276,21 +347,21 @@ class UrlapMezo {
     /**
      * @returns {string} - A mező azonosítója
      */
-    get id(){
+    get id() {
         return this.#id; // Getter metódus, amely visszaadja a #id mező értékét
     }
 
     /**
      * @returns {HTMLInputElement} - A bemeneti mező
      */
-    get ertek(){
+    get ertek() {
         return this.#bemenetiMezo.value; // Getter metódus, amely visszaadja a bemeneti mező értékét
     }
 
     /**
      * @returns {HTMLLabelElement} - A címke elem
      */
-    set hiba(ertek){
+    set hiba(ertek) {
         this.#hibaElem.textContent = ertek; // Setter metódus, amely beállítja a hibaüzenetet
     }
 
@@ -314,12 +385,12 @@ class UrlapMezo {
      * Létrehoz egy új div elemet, amely tartalmazza a címkét, a bemeneti mezőt és a hibaüzenetet.
      * @returns {HTMLDivElement} - A létrehozott div elem
      */
-    divMeghiv(){
+    divMeghiv() {
         const div = csinalDiv('field'); // Meghívja a csinalDiv függvényt 'field' osztálynévvel, és eltárolja az eredményt div néven
         const br1 = document.createElement('br') // Létrehoz egy új 'br' elemet, hogy új sort hozzon létre
         const br2 = document.createElement('br') // Létrehoz egy új 'br' elemet, hogy új sort hozzon létre
         const htmlElemek = [this.#cimkeElem, br1, this.#bemenetiMezo, br2, this.#hibaElem]; // Létrehoz egy tömböt, amely tartalmazza a címkét, a bemeneti mezőt és a hibaüzenetet
-        for(const elem of htmlElemek){ // Végigiterál a htmlElemek tömb elemein
+        for (const elem of htmlElemek) { // Végigiterál a htmlElemek tömb elemein
             div.appendChild(elem);  // Hozzáadja az elemeket a div-hez
         }
         return div; // Visszaadja a létrehozott div elemet

@@ -1,4 +1,15 @@
 /**
+ * @callback AddExploreCallback
+ * @param {Object} felfedezes - Az újonnan hozzáadott felfedezés objektum
+ */
+
+/**
+ * @callback TableCallback
+ * @param {Array<Object>} felfedezesek - A megjelenítendő felfedezések listája
+ */
+
+
+/**
  * A `Manager` osztály felelős a felfedezések kezeléséért és a callback-ek kezeléséért
  */
 class Manager {
@@ -17,7 +28,7 @@ class Manager {
     /**
      * @type {TableCallback} - A callback függvény, amelyet a táblázat betöltésekor hív meg
      */
-    #renderTableCallback; // A callback függvény, amelyet a táblázat betöltésekor hív meg
+    #renderTableCallback;
 
     /**
      * Létrehoz egy új `Manager` példányt
@@ -61,7 +72,7 @@ class Manager {
     /**
      * Szűrő metódus, amely a felfedezések tömbjét szűri a megadott callback függvény alapján.
      * @param {ExploreFilterCallback} callback - A callback függvény, amely meghatározza a szűrési feltételt
-     * @returns {void} Nem ad vissza értéket, csak megjeleníti az eredményt a renderTableCallback segítségével
+     * @returns {void} - Csak megjeleníti az eredményt a `renderTableCallback` segítségével.
      */
     szuro(callback) {
         const eredmeny = [] // Létrehoz egy üres tömböt, amelybe a szűrt felfedezéseket tárolja
