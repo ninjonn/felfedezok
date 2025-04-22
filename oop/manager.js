@@ -1,11 +1,17 @@
 /**
  * @callback AddExploreCallback
- * @param {Object} felfedezes - Az újonnan hozzáadott felfedezés objektum
+ * @param {Explore} felfedezes - Az újonnan hozzáadott felfedezés
  */
 
 /**
  * @callback TableCallback
- * @param {Array<Object>} felfedezesek - A megjelenítendő felfedezések listája
+ * @param {Explore[]} felfedezesek - A megjelenítendő felfedezések listája
+ */
+
+/**
+ * @callback ExploreFilterCallback
+ * @param {Explore} felfedezes - A felfedezés, amit szűrni kell
+ * @returns {boolean}
  */
 
 
@@ -14,7 +20,7 @@
  */
 class Manager {
     /**
-     * @type {Array<Object>} - A felfedezések tárolására szolgáló tömb
+     * @type {Explore[]} - A felfedezések tárolására szolgáló tömb
      * @private
      */
     #tomb;
@@ -55,7 +61,7 @@ class Manager {
 
     /**
      * Új felfedezést ad hozzá a tömbhöz, és meghívja a callback függvényt
-     * @param {Object} felfedezes - A hozzáadandó felfedezés objektum
+     * @param {Explore} felfedezes - A hozzáadandó felfedezés objektum
      */
     addExplore(felfedezes) {
         this.#tomb.push(felfedezes); // Hozzáadja a felfedezést a tömbhöz
@@ -63,16 +69,7 @@ class Manager {
     }
 
     /**
-     * Callback függvény, amely meghatározza a szűrési feltételt.
-     * @callback ExploreFilterCallback
-     * @param {Explore} felfedezes - A felfedezés objektum, amelyet szűrni kell
-     * @returns {boolean} - Visszaadja, hogy a felfedezés megfelel-e a szűrési feltételnek
-     */
-
-    /**
-     * Szűrő metódus, amely a felfedezések tömbjét szűri a megadott callback függvény alapján.
-     * @param {ExploreFilterCallback} callback - A callback függvény, amely meghatározza a szűrési feltételt
-     * @returns {void} - Csak megjeleníti az eredményt a `renderTableCallback` segítségével.
+     * @param {ExploreFilterCallback} callback
      */
     szuro(callback) {
         const eredmeny = [] // Létrehoz egy üres tömböt, amelybe a szűrt felfedezéseket tárolja
@@ -97,9 +94,8 @@ class Manager {
     }
 
     /**
-     * A megadott szűrési feltétel alapján visszaadja a találatokat.
-     * @param {ExploreFilterCallback} callback - A callback függvény, amely meghatározza a szűrési feltételt
-     * @returns {Array<Object>} - A szűrésnek megfelelő felfedezések listája
+     * @param {ExploreFilterCallback} callback
+     * @returns {Explore[]}
      */
     szurtLista(callback) {
         return this.#tomb.filter(callback); // Visszaadja a szűrésnek megfelelő felfedezések listáját

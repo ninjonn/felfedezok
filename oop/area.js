@@ -89,14 +89,15 @@ class Tablazat extends Terulet {
     }
 
     /**
+     * @callback TableCallback
+     * @param {Explore[]} tomb - A felfedezések tömbje
+     */
+
+    /**
      * Beállítja a táblázat renderelésének callback függvényét.
      * @param {HTMLTableSectionElement} tablaTest - A táblázat törzs elem
      */
     #setRenderTableCallback(tablaTest) {
-        /** 
-         * @callback TableCallback
-         * @param {Array<Explore>} tomb - A felfedezések tömbje
-         */
         this.manager.setRenderTableCallback((tomb) => { 
             tablaTest.innerHTML = ''; // Törli a táblázat törzs tartalmát
             tomb.forEach(felfedezes => { // Végigiterál a felfedezések tömbjén
@@ -168,7 +169,7 @@ class Urlap extends Terulet {
 
     /**
      * Létrehozza az űrlapot a megadott mezőlistával.
-     * @param {Array<Object>} mezoLista - A bemeneti mezők listája, amely tartalmazza az azonosítót és a címkét.
+     * @param {Array<string>} mezoLista - A mezőlista, amely tartalmazza az azonosítót és a címkét.
      */
     #createUrlap(mezoLista) {
         const urlap = document.createElement('form'); // Létrehoz egy új űrlap elemet
