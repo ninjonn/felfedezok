@@ -20,3 +20,4 @@ const manager = new Manager(); // A Manager osztály példányosítása, létreh
 const tabla = new Tablazat('table', manager); // A Tablazat osztály példányosítása, létrehozva egy új 'table' osztályú elemet
 const urlap = new Urlap('form', mezokLista, manager); // Az Urlap osztály példányosítása, létrehozva egy új 'form' osztályú elemet
 const fajlFeltoltes = new FeltoltesLetoltes('file', manager); // A FeltoltesLetoltes osztály példányosítása, létrehozva egy új 'file' osztályú elemet
+const szuroOop = new Szuro('filter', manager); // A Szuro osztály példányosítása, létrehozva egy új 'filter' osztályú elemet
