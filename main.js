@@ -11,6 +11,17 @@ const csinalDiv = (osztalyNev) => {
     return div; // Visszaadja a létrehozott és beállított div elemet
 }
 
+
+const szuro = (felfedezesTomb, callback) => { // Létrehoz egy új tömböt, ami a szűrt elemeket tárolja
+    const eredmeny = []; // Létrehoz egy új üres tömböt, ami a szűrt elemeket tárolja
+    for(const elem of felfedezesTomb){ // Végigiterál a felfedezesTomb tömb elemein
+        if(callback(elem)){ // Ha a callback függvény igaz értéket ad vissza az elemre
+            eredmeny.push(elem); // Hozzáadja az elemet az eredmény tömbhöz
+        }
+    }
+    return eredmeny; // Visszaadja a szűrt elemeket tartalmazó tömböt
+}
+
 const kontenerDiv = csinalDiv('container'); // Meghívjuk a csinalDiv függvényt 'container' osztálynévvel, és eltároljuk az eredményt kontenerDiv változóba
 document.body.appendChild(kontenerDiv); // Hozzáadjuk a kontenerDiv-et az oldal body eleméhez
 const tablaDiv = csinalDiv('table'); // Meghívjuk a csinalDiv függvényt 'table' osztálynévvel
@@ -26,8 +37,8 @@ for (const cellaTartalom of theadCella) { // Végigiterálunk a theadCella tömb
     thcella.innerText = cellaTartalom; // Beállítjuk a cella szövegét a cellaTartalom változó értékére
     tablaFejSor.appendChild(thcella); // Hozzáadjuk a cellát a fejléc sorhoz
 }
-const tablaTest = document.createElement('tbody'); // Létrehozunk egy új 'tbody' elemet
-tablaSim.appendChild(tablaTest); // Hozzáadjuk a 'tbody' elemet a táblázathoz
+const tablaTest = document.createElement('tbody'); // Létrehozunk egy új 'tablaTest' elemet
+tablaSim.appendChild(tablaTest); // Hozzáadjuk a 'tablaTest' elemet a táblázathoz
 
 const urlapDiv = csinalDiv('form'); // Meghívjuk a makeDiv-et, ezúttal 'form' osztálynévvel, és eltároljuk az eredményt urlapDiv néven
 
@@ -136,11 +147,12 @@ fajlInput.addEventListener('change', (e) => {
        for(const sor of fejlecTorles){ // Végigiterálunk a fájl sorain
             const tagoltSor = sor.trim(); // Eltávolítjuk a felesleges szóközöket a sor elejéről és végéről
             const mezok = tagoltSor.split(';'); // A sort mezőkre bontjuk a pontosvesszők mentén
+
             const felfedezesek = { // Létrehozunk egy új objektumot, ami a felfedezéseket tárolja
-                nev: mezok[0], // A felfedező neve
-                szolgalat: mezok[1], // A felfedező szolgálata
-                evszam: mezok[2], // A felfedezés évszáma
-                felfedezes: mezok[3] // A felfedezés neve
+                nev: mezok[0].trim(), // A felfedező neve
+                szolgalat: mezok[1].trim(), // A felfedező szolgálata
+                evszam: mezok[2].trim(), // A felfedezés évszáma
+                felfedezes: mezok[3].trim() // A felfedezés neve
             }
             tomb.push(felfedezesek); // Hozzáadjuk az objektumot a tomb tömbhöz
             const tableTestSor = document.createElement('tr'); // Létrehozunk egy új 'tr' elemet, ami a táblázat törzsében egy sort képvisel
@@ -187,3 +199,59 @@ letoltesGomb.addEventListener('click', () => {
     link.click(); // Kattintunk a linkre, hogy elindítsuk a letöltést
     URL.revokeObjectURL(link.href); // Visszavonjuk a Blob objektum URL-jét, hogy felszabadítsuk a memóriát
 })
+
+
+const urlapEredmenyDiv = csinalDiv('urlapFilter'); // Meghívjuk a csinalDiv függvényt 'urlapFilter' osztálynévvel, és eltároljuk az eredményt urlapEredmenyDiv néven
+kontenerDiv.appendChild(urlapEredmenyDiv); // A konténer div-hez hozzáadjuk az urlapEredmenyDiv-et is
+
+const urlapFilter = document.createElement('form'); // Létrehozunk egy új 'form' elemet, ami a szűrő űrlapot képviseli
+urlapEredmenyDiv.appendChild(urlapFilter); // Hozzáadjuk az urlapFilter-t az urlapEredmenyDiv-hez
+
+const bemenetSzuro = document.createElement('input'); // Létrehozunk egy új 'input' elemet, ami a szűrő bemenetét képviseli
+bemenetSzuro.id = 'bemenetSzuro'; // Beállítjuk a bemenet azonosítóját 'bemenetSzuro'-ra
+bemenetSzuro.placeholder = 'Név részlet'; // Beállítjuk a bemenet helyőrző szövegét 'Név részlet'-re
+urlapFilter.appendChild(bemenetSzuro); // Hozzáadjuk a bemenetet az űrlaphoz
+
+const selectSzuro = document.createElement('select'); // Létrehozunk egy új 'select' elemet, ami a szűrő kiválasztását képviseli
+['', 'angol', 'portugal', 'spanyol'].forEach(szolg => { // Végigiterálunk a szolgáltatások tömb elemein
+  const option = document.createElement('option'); // Létrehozunk egy új 'option' elemet, ami a kiválasztási lehetőséget képviseli
+  option.value = szolg; // Beállítjuk az option értékét a szolgáltatás nevére
+  option.textContent = szolg === '' ? 'üres' : szolg; // Beállítjuk az option szövegét a szolgáltatás nevére, ha üres, akkor 'üres'-t írunk ki
+  selectSzuro.appendChild(option); // Hozzáadjuk az option-t a select-hez
+});
+urlapFilter.appendChild(selectSzuro); // Hozzáadjuk a select-et az űrlaphoz
+
+const szuroGomb = document.createElement('button'); // Létrehozunk egy új 'button' elemet, ami a szűrő gombot képviseli
+szuroGomb.type = 'button'; // Beállítjuk a gomb típusát 'button'-ra, hogy ne küldje el az űrlapot
+szuroGomb.textContent = 'Számol'; // Beállítjuk a gomb szövegét 'Számol'-ra
+urlapFilter.appendChild(szuroGomb); // Hozzáadjuk a gombot az űrlaphoz
+
+const eredmenyDiv = document.createElement('div'); // Létrehozunk egy új 'div' elemet, ami az eredmény div-et képviseli
+eredmenyDiv.className = 'result'; // Beállítjuk az eredmény div osztályát 'result'-ra
+urlapEredmenyDiv.appendChild(eredmenyDiv); // Hozzáadjuk az eredmény div-et az urlapEredmenyDiv-hez
+
+/**
+ * Eseményfigyelő a szűrő gomb 'click' eseményére
+ * @param {MouseEvent} e - Az esemény objektum, amely a 'click' eseményhez tartozik
+ */
+szuroGomb.addEventListener('click', () => {
+  const nevSzuro = selectSzuro.value.trim().toLowerCase(); // Kiválasztjuk a név szűrőt, eltávolítjuk a felesleges szóközöket, és kisbetűsre alakítjuk
+  const szolgalatSzuro = bemenetSzuro.value; // Kiválasztjuk a szolgálat szűrőt
+
+  let szamlalo; // Létrehozunk egy változót, ami a szűrt elemek számát tárolja
+
+  if (!nevSzuro && !szolgalatSzuro) { // Ha nincs szűrő beállítva
+    szamlalo = tomb.length; // A szűrt elemek száma a tömb hossza
+  } else if (nevSzuro && !szolgalatSzuro) { // Ha csak a név szűrő van beállítva
+    szamlalo = tomb.filter(item => item.nev.toLowerCase().includes(nevSzuro)).length; // A szűrt elemek száma a név szűrő alapján
+  } else if (!nevSzuro && szolgalatSzuro) { // Ha csak a szolgálat szűrő van beállítva
+    szamlalo = tomb.filter(item => item.szolgalat.toLowerCase() === szolgalatSzuro).length; // A szűrt elemek száma a szolgálat szűrő alapján
+  } else { // Ha mindkét szűrő be van állítva
+    szamlalo = tomb.filter(item => // A szűrt elemek száma a név és szolgálat szűrő alapján
+      item.nev.toLowerCase().includes(nevSzuro) && // A név szűrő alapján
+      item.szolgalat.toLowerCase() === szolgalatSzuro // A szolgálat szűrő alapján
+    ).length; // A szűrt elemek száma a név és szolgálat szűrő alapján
+  }
+
+  eredmenyDiv.textContent = `A feltételnek megfelelő elemek száma: ${szamlalo}`; // Beállítjuk az eredmény div szövegét a szűrt elemek számával
+});
