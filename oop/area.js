@@ -157,7 +157,7 @@ class Urlap extends Terulet {
     /**
      * * Létrehoz egy új `Urlap` példányt.
      * @param {string} cssOsztaly - A CSS osztály neve, amelyet az űrlaphoz rendelünk.
-     * @param {Array<string>} mezoLista - A bemeneti mezők listája, amely tartalmazza az azonosítót és a címkét.
+     * @param {{mezoid:String,mezocimke:String}[]} mezoLista - A bemeneti mezők listája, amely tartalmazza az azonosítót és a címkét.
      * @param {Manager} manager - A manager példány, amely a felfedezések kezeléséért felelős
      */
     constructor(cssOsztaly, mezoLista, manager) {
@@ -169,7 +169,7 @@ class Urlap extends Terulet {
 
     /**
      * Létrehozza az űrlapot a megadott mezőlistával.
-     * @param {Array<string>} mezoLista - A mezőlista, amely tartalmazza az azonosítót és a címkét.
+     * @param {{mezoid:String,mezocimke:String}[]} mezoLista - A mezőlista, amely tartalmazza az azonosítót és a címkét.
      */
     #createUrlap(mezoLista) {
         const urlap = document.createElement('form'); // Létrehoz egy új űrlap elemet

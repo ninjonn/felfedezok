@@ -10,10 +10,20 @@ const csinalDiv = (osztalyNev) => {
 }
 
 /**
+ * @typedef {{nev:String,szolgalat:String,evszam:Number,felfedezes:String}} Felfedezes
+ */
+
+/**
+ * @callback SzuroCallback
+ * @param {Felfedezes} felfedezes
+ * @returns {boolean}
+ */
+
+/**
  * Szűrő függvény, amely egy tömböt és egy callback függvényt vár
- * @param {Array} felfedezesTomb - A tömb, amelyet szűrni szeretnénk
- * @param {Function} callback - A callback függvény, amely meghatározza a szűrés feltételeit
- * @returns {Array} - A szűrt tömb
+ * @param {Felfedezes[]} felfedezesTomb
+ * @param {SzuroCallback} callback
+ * @returns {Felfedezes[]}
  */
 const szuro = (felfedezesTomb, callback) => { // Létrehoz egy új tömböt, ami a szűrt elemeket tárolja
     const eredmeny = []; // Létrehoz egy új üres tömböt, ami a szűrt elemeket tárolja
