@@ -55,7 +55,7 @@ class Szuro extends Terulet {
             const nevErtek = nevBemenet.value.trim().toLowerCase(); // A név szűrési értéke, kisbetűs formában és eltávolítva a felesleges szóközöket
             const kivalasztottSzolgalat = select.value; // A kiválasztott szolgálat értéke a legördülő menüből
 
-            const egyezesek = this.manager.szurtLista((item) => { // Szűrési feltétel megadása a szűrt lista metódusban 
+            const egyezesek = this.manager.szuro((item) => { // Szűrési feltétel megadása a szűrt lista metódusban 
                 const nevEgyezes = nevErtek ? item.nev.toLowerCase().includes(nevErtek) : true; // Ellenőrzi, hogy a név tartalmazza-e a megadott értéket 
                 const szolgalatEgyezes = kivalasztottSzolgalat ? item.szolgalat === kivalasztottSzolgalat : true; // Ellenőrzi, hogy a szolgálat megegyezik-e a kiválasztott értékkel 
                 return nevEgyezes && szolgalatEgyezes; // Visszaadja az egyezést, ha mindkét feltétel teljesül

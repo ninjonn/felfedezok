@@ -78,7 +78,7 @@ class Manager {
                 eredmeny.push(felfedezes) // Hozzáadja a felfedezést az eredmény tömbhöz
             }
         }
-        this.#renderTableCallback(eredmeny); // Meghívja a renderTableCallback függvényt az eredmény tömbbel
+        return eredmeny // Visszaadja a szűrt felfedezéseket
     }
 
     /**
@@ -91,13 +91,5 @@ class Manager {
             eredmeny.push(`${felfedezes.nev};${felfedezes.szolgalat};${felfedezes.evszam};${felfedezes.felfedezes}`); // Hozzáad egy új sort a tömbhöz, amely a felfedezés adatait tartalmazza pontosvesszővel elválasztva
         }
         return eredmeny.join('\n'); // A tömb elemeit egyetlen szöveggé alakítja, ahol a sorokat új sorral választja el
-    }
-
-    /**
-     * @param {ExploreFilterCallback} callback
-     * @returns {Explore[]}
-     */
-    szurtLista(callback) {
-        return this.#tomb.filter(callback); // Visszaadja a szűrésnek megfelelő felfedezések listáját
     }
 }
